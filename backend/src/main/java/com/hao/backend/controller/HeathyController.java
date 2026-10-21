@@ -1,6 +1,7 @@
 package com.hao.backend.controller;
 
 import com.hao.backend.common.BaseResponse;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -8,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/heathy")
 public class HeathyController {
 
+    @GetMapping
     public BaseResponse<String> ping(){
         return BaseResponse.success();
     }
