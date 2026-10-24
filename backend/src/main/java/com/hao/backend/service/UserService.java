@@ -1,6 +1,7 @@
 package com.hao.backend.service;
 
 import com.hao.backend.common.PageResult;
+import com.hao.backend.model.dto.AdminUserUpdateRequest;
 import com.hao.backend.model.dto.UserQueryRequest;
 import com.hao.backend.model.entity.User;
 import com.hao.backend.model.vo.AdminUserVO;
@@ -14,4 +15,8 @@ import com.mybatisflex.core.service.IService;
 public interface UserService extends IService<User> {
 
     PageResult<AdminUserVO> pageUsers(UserQueryRequest query);
+
+    AdminUserVO updateUser(Long id, AdminUserUpdateRequest request);
+
+    void deleteUser(Long id);
 }

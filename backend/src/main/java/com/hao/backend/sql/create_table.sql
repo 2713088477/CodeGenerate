@@ -4,9 +4,9 @@ create database if not exists code_generator;
 # 创建用户表
 create table if not exists user (
     id bigint primary key auto_increment comment '用户ID',
-    userAccount varchar(256) not null comment '用户账号',
-    userPassword varchar(512) not null comment '用户密码',
-    username varchar(256) null comment '用户名',
+    userAccount varchar(32) not null comment '用户账号',
+    userPassword varchar(64) not null comment '用户密码',
+    username varchar(32) null comment '用户名',
     avatar varchar(1024)  null comment '头像',
     bio varchar(512) null comment '个人简介',
     role varchar(20) default 'user' not null comment '角色 admin:管理员 user:用户',

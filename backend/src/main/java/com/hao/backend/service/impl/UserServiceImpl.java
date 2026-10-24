@@ -4,6 +4,7 @@ import com.hao.backend.common.BusinessException;
 import com.hao.backend.common.PageResult;
 import com.hao.backend.common.ResponseCode;
 import com.hao.backend.mapper.UserMapper;
+import com.hao.backend.model.dto.AdminUserUpdateRequest;
 import com.hao.backend.model.dto.UserQueryRequest;
 import com.hao.backend.model.entity.User;
 import com.hao.backend.model.enums.UserRole;
@@ -11,9 +12,11 @@ import com.hao.backend.model.vo.AdminUserVO;
 import com.hao.backend.service.UserService;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.core.util.LambdaGetter;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -25,6 +28,12 @@ import java.util.Map;
  */
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+
+    private final PasswordEncoder passwordEncoder;
+
+    public UserServiceImpl(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     private static final Map<String, LambdaGetter<User>> SORT_FIELDS = Map.of(
             "id", User::getId,
@@ -65,5 +74,41 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ResponseCode.PARAMS_ERROR, "排序字段不正确");
         }
         queryWrapper.orderBy(column, Boolean.TRUE.equals(query.getAsc()));
+    }
+
+    @Override
+    public AdminUserVO updateUser(Long id, AdminUserUpdateRequest request) {
+        User user = getExistingUser(id);
+        String password = StringUtils.trimToNull(request.getUserPassword());
+        boolean changeUsername = request.getUsername() != null;
+        boolean changeAvatar = request.getAvatar() != null;
+        boolean changeBio = request.getBio() != null;
+        if (!changeUsername && !changeAvatar && !changeBio && password == null) {
+            return AdminUserVO.from(user);
+        }
+
+        String encodedPassword = password == null ? null : passwordEncoder.encode(password);
+        UpdateChain.of(User.class)
+                .set(User::getUsername, StringUtils.trimToNull(request.getUsername()), changeUsername)
+                .set(User::getAvatar, StringUtils.trimToNull(request.getAvatar()), changeAvatar)
+                .set(User::getBio, StringUtils.trimToNull(request.getBio()), changeBio)
+                .set(User::getUserPassword, encodedPassword, encodedPassword != null)
+                .where(User::getId).eq(id)
+                .update();
+        return AdminUserVO.from(getExistingUser(id));
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        getExistingUser(id);
+        removeById(id);
+    }
+
+    private User getExistingUser(Long id) {
+        User user = getById(id);
+        if (user == null) {
+            throw new BusinessException(ResponseCode.NOT_FOUND, "用户不存在");
+        }
+        return user;
     }
 }
