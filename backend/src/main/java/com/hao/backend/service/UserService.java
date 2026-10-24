@@ -1,7 +1,10 @@
 package com.hao.backend.service;
 
-import com.mybatisflex.core.service.IService;
+import com.hao.backend.common.PageResult;
+import com.hao.backend.model.dto.UserQueryRequest;
 import com.hao.backend.model.entity.User;
+import com.hao.backend.model.vo.AdminUserVO;
+import com.mybatisflex.core.service.IService;
 
 /**
  * 用户表 服务层。
@@ -10,4 +13,5 @@ import com.hao.backend.model.entity.User;
  */
 public interface UserService extends IService<User> {
 
+    PageResult<AdminUserVO> pageUsers(UserQueryRequest query);
 }

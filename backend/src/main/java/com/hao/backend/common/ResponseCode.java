@@ -16,7 +16,9 @@ public enum ResponseCode {
 
     UNAUTHORIZED(40001, "未授权"),
     BAD_REQUEST(40002, "请求错误"),
-    NOT_FOUND(40003, "未找到"),
+    FORBIDDEN(40003, "禁止访问"),
+    NOT_FOUND(40004, "未找到"),
+    
 
     INTERNAL_SERVER_ERROR(50001, "服务器错误"),
     SERVICE_UNAVAILABLE(50002, "服务不可用"),
