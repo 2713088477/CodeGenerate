@@ -11,4 +11,6 @@ public interface AuthService {
     UserProfileVO register(RegisterRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse);
 
     UserProfileVO login(LoginRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse);
+
+    void logout(HttpServletRequest httpRequest, HttpServletResponse httpResponse);
 }

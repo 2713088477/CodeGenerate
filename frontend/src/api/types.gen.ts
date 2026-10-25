@@ -4,11 +4,192 @@ export type ClientOptions = {
     baseURL: 'http://localhost:8123/api' | (string & {});
 };
 
+export type AdminUserUpdateRequest = {
+    username?: string;
+    avatar?: string;
+    bio?: string;
+    userPassword?: string;
+};
+
+export type AdminUserVo = {
+    id?: number;
+    userAccount?: string;
+    username?: string;
+    avatar?: string;
+    bio?: string;
+    role?: string;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
+export type BaseResponseAdminUserVo = {
+    code?: number;
+    message?: string;
+    data?: AdminUserVo;
+};
+
+export type RegisterRequest = {
+    userAccount: string;
+    userPassword: string;
+    confirmPassword: string;
+};
+
+export type BaseResponseUserProfileVo = {
+    code?: number;
+    message?: string;
+    data?: UserProfileVo;
+};
+
+export type UserProfileVo = {
+    id?: number;
+    userAccount?: string;
+    username?: string;
+    avatar?: string;
+    role?: string;
+};
+
+export type BaseResponseVoid = {
+    code?: number;
+    message?: string;
+    data?: unknown;
+};
+
+export type LoginRequest = {
+    userAccount: string;
+    userPassword: string;
+};
+
+export type UserQueryRequest = {
+    pageNum?: number;
+    pageSize?: number;
+    sortField?: string;
+    asc?: boolean;
+    userAccount?: string;
+    username?: string;
+    role?: string;
+};
+
+export type BaseResponsePageResultAdminUserVo = {
+    code?: number;
+    message?: string;
+    data?: PageResultAdminUserVo;
+};
+
+export type PageResultAdminUserVo = {
+    records?: Array<AdminUserVo>;
+    pageNum?: number;
+    pageSize?: number;
+    total?: number;
+    totalPage?: number;
+};
+
 export type BaseResponseString = {
     code?: number;
     message?: string;
     data?: string;
 };
+
+export type DeleteData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/user/{id}';
+};
+
+export type DeleteResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponseVoid;
+};
+
+export type DeleteResponse = DeleteResponses[keyof DeleteResponses];
+
+export type UpdateData = {
+    body: AdminUserUpdateRequest;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/user/{id}';
+};
+
+export type UpdateResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponseAdminUserVo;
+};
+
+export type UpdateResponse = UpdateResponses[keyof UpdateResponses];
+
+export type RegisterData = {
+    body: RegisterRequest;
+    path?: never;
+    query?: never;
+    url: '/auth/register';
+};
+
+export type RegisterResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponseUserProfileVo;
+};
+
+export type RegisterResponse = RegisterResponses[keyof RegisterResponses];
+
+export type LogoutData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/logout';
+};
+
+export type LogoutResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponseVoid;
+};
+
+export type LogoutResponse = LogoutResponses[keyof LogoutResponses];
+
+export type LoginData = {
+    body: LoginRequest;
+    path?: never;
+    query?: never;
+    url: '/auth/login';
+};
+
+export type LoginResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponseUserProfileVo;
+};
+
+export type LoginResponse = LoginResponses[keyof LoginResponses];
+
+export type PageData = {
+    body?: never;
+    path?: never;
+    query: {
+        query: UserQueryRequest;
+    };
+    url: '/user/page';
+};
+
+export type PageResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponsePageResultAdminUserVo;
+};
+
+export type PageResponse = PageResponses[keyof PageResponses];
 
 export type PingData = {
     body?: never;

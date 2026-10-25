@@ -36,4 +36,10 @@ public class AuthController {
                                              HttpServletResponse httpResponse) {
         return BaseResponse.success(authService.login(request, httpRequest, httpResponse));
     }
+
+    @PostMapping("/logout")
+    public BaseResponse<Void> logout(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+        authService.logout(httpRequest, httpResponse);
+        return BaseResponse.success();
+    }
 }
