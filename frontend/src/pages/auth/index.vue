@@ -6,6 +6,7 @@ import { computed, reactive, shallowRef, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { LoginRequest, RegisterRequest } from '@/api'
 import { useUserStore } from '@/stores/user'
+import { errorMessage } from '@/utils/response'
 
 const route = useRoute()
 const router = useRouter()
@@ -59,10 +60,6 @@ const registerRules = reactive<FormRules<RegisterRequest>>({
   userPassword: passwordRules,
   confirmPassword: [{ validator: validateConfirmPassword, trigger: 'blur' }],
 })
-
-function errorMessage(error: unknown) {
-  return error instanceof Error ? error.message : '请求失败'
-}
 
 function redirectAfterAuth() {
   const redirect = route.query.redirect

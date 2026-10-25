@@ -12,7 +12,7 @@ export type AdminUserUpdateRequest = {
 };
 
 export type AdminUserVo = {
-    id?: number;
+    id?: string;
     userAccount?: string;
     username?: string;
     avatar?: string;
@@ -41,7 +41,7 @@ export type BaseResponseUserProfileVo = {
 };
 
 export type UserProfileVo = {
-    id?: number;
+    id?: string;
     userAccount?: string;
     username?: string;
     avatar?: string;
@@ -92,7 +92,7 @@ export type BaseResponseString = {
 export type DeleteData = {
     body?: never;
     path: {
-        id: number;
+        id: string;
     };
     query?: never;
     url: '/user/{id}';
@@ -110,7 +110,7 @@ export type DeleteResponse = DeleteResponses[keyof DeleteResponses];
 export type UpdateData = {
     body: AdminUserUpdateRequest;
     path: {
-        id: number;
+        id: string;
     };
     query?: never;
     url: '/user/{id}';

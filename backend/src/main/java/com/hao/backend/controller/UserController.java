@@ -6,6 +6,8 @@ import com.hao.backend.model.dto.AdminUserUpdateRequest;
 import com.hao.backend.model.dto.UserQueryRequest;
 import com.hao.backend.model.vo.AdminUserVO;
 import com.hao.backend.service.UserService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,12 +38,14 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public BaseResponse<AdminUserVO> update(@PathVariable Long id, @RequestBody @Valid AdminUserUpdateRequest request) {
+    public BaseResponse<AdminUserVO> update(
+            @Parameter(schema = @Schema(type = "string")) @PathVariable Long id,
+            @RequestBody @Valid AdminUserUpdateRequest request) {
         return BaseResponse.success(userService.updateUser(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public BaseResponse<Void> delete(@PathVariable Long id) {
+    public BaseResponse<Void> delete(@Parameter(schema = @Schema(type = "string")) @PathVariable Long id) {
         userService.deleteUser(id);
         return BaseResponse.success();
     }
