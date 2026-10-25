@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteData, DeleteResponses, LoginData, LoginResponses, LogoutData, LogoutResponses, PageData, PageResponses, PingData, PingResponses, RegisterData, RegisterResponses, UpdateData, UpdateResponses } from './types.gen';
+import type { CreateData, CreateResponses, DeleteData, DeleteResponses, LoginData, LoginResponses, LogoutData, LogoutResponses, PageData, PageResponses, PingData, PingResponses, RegisterData, RegisterResponses, UpdateData, UpdateResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -22,6 +22,15 @@ export const delete_ = <ThrowOnError extends boolean = false>(options: Options<D
 
 export const update = <ThrowOnError extends boolean = false>(options: Options<UpdateData, ThrowOnError>): RequestResult<UpdateResponses, unknown, ThrowOnError> => (options.client ?? client).put<UpdateResponses, unknown, ThrowOnError>({
     url: '/user/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const create = <ThrowOnError extends boolean = false>(options: Options<CreateData, ThrowOnError>): RequestResult<CreateResponses, unknown, ThrowOnError> => (options.client ?? client).post<CreateResponses, unknown, ThrowOnError>({
+    url: '/user',
     ...options,
     headers: {
         'Content-Type': 'application/json',

@@ -15,6 +15,8 @@ public class AdminUserUpdateRequest {
     @Size(max = 512, message = "个人简介长度不能超过 512")
     private String bio;
 
+    private String role;
+
     @Size(min = 6, max = 64, message = "密码长度为 6 到 64 位")
     private String userPassword;
 }

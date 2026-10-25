@@ -1,6 +1,12 @@
 <script setup lang="ts">
-import { delete_, page, update } from '@/api'
-import type { AdminUserUpdateRequest, AdminUserVo, PageResultAdminUserVo, UserQueryRequest } from '@/api'
+import { create, delete_, page, update } from '@/api'
+import type {
+  AdminUserCreateRequest,
+  AdminUserUpdateRequest,
+  AdminUserVo,
+  PageResultAdminUserVo,
+  UserQueryRequest,
+} from '@/api'
 import { ensureSuccess, errorMessage, readData } from '@/utils/response'
 import type { FormInstance, FormItemRule, FormRules, TableInstance } from 'element-plus'
 import {
@@ -41,7 +47,9 @@ const role = shallowRef('')
 const sortField = shallowRef<string>()
 const asc = shallowRef(true)
 const editVisible = shallowRef(false)
+const createVisible = shallowRef(false)
 const saving = shallowRef(false)
+const creating = shallowRef(false)
 const editingId = shallowRef<string>()
 const editingAccount = shallowRef('')
 const editFormRef = useTemplateRef<FormInstance>('editFormRef')
@@ -49,7 +57,18 @@ const editForm = reactive<AdminUserUpdateRequest>({
   username: '',
   avatar: '',
   bio: '',
+  role: 'user',
   userPassword: '',
+})
+const createFormRef = useTemplateRef<FormInstance>('createFormRef')
+const createForm = reactive<AdminUserCreateRequest>({
+  userAccount: '',
+  userPassword: '',
+  confirmPassword: '',
+  username: '',
+  avatar: '',
+  bio: '',
+  role: 'user',
 })
 
 const validatePassword: FormItemRule['validator'] = (_rule, value, callback) => {
@@ -64,11 +83,39 @@ const validatePassword: FormItemRule['validator'] = (_rule, value, callback) => 
   callback()
 }
 
+const validateConfirmPassword: FormItemRule['validator'] = (_rule, value, callback) => {
+  if (value === '') {
+    callback(new Error('确认密码不能为空'))
+    return
+  }
+  if (value !== createForm.userPassword) {
+    callback(new Error('两次密码不一致'))
+    return
+  }
+  callback()
+}
+
 const editRules: FormRules<AdminUserUpdateRequest> = {
   username: [{ max: 32, message: '用户名长度不能超过 32', trigger: 'blur' }],
   avatar: [{ max: 1024, message: '头像地址长度不能超过 1024', trigger: 'blur' }],
   bio: [{ max: 512, message: '个人简介长度不能超过 512', trigger: 'blur' }],
+  role: [{ required: true, message: '请选择角色', trigger: 'change' }],
   userPassword: [{ validator: validatePassword, trigger: 'blur' }],
+}
+
+const createRules: FormRules<AdminUserCreateRequest> = {
+  userAccount: [
+    { required: true, whitespace: true, message: '账号不能为空', trigger: 'blur' },
+    { max: 32, message: '账号长度不能超过 32', trigger: 'blur' },
+  ],
+  userPassword: [
+    { required: true, message: '密码不能为空', trigger: 'blur' },
+    { min: 6, max: 64, message: '密码长度为 6 到 64 位', trigger: 'blur' },
+  ],
+  confirmPassword: [{ required: true, message: '确认密码不能为空', trigger: 'blur' },{ validator: validateConfirmPassword, trigger: 'blur' }],
+  username: [{ max: 32, message: '用户名长度不能超过 32', trigger: 'blur' }],
+  avatar: [{ max: 1024, message: '头像地址长度不能超过 1024', trigger: 'blur' }],
+  bio: [{ max: 512, message: '个人简介长度不能超过 512', trigger: 'blur' }],
 }
 
 function applyPage(data: PageResultAdminUserVo) {
@@ -170,6 +217,53 @@ function avatarText(row: AdminUserVo) {
   return (row.username || row.userAccount || '').slice(0, 1)
 }
 
+function openCreate() {
+  createForm.userAccount = ''
+  createForm.userPassword = ''
+  createForm.confirmPassword = ''
+  createForm.username = ''
+  createForm.avatar = ''
+  createForm.bio = ''
+  createForm.role = 'user'
+  createVisible.value = true
+  void nextTick(() => createFormRef.value?.clearValidate())
+}
+
+async function submitCreate() {
+  if (creating.value) {
+    return
+  }
+  try {
+    await createFormRef.value?.validate()
+  } catch {
+    return
+  }
+  creating.value = true
+  try {
+    readData<AdminUserVo>(
+      await create({
+        body: {
+          userAccount: createForm.userAccount.trim(),
+          userPassword: createForm.userPassword,
+          confirmPassword: createForm.confirmPassword,
+          username: createForm.username,
+          avatar: createForm.avatar,
+          bio: createForm.bio,
+          role: createForm.role,
+        },
+      }),
+    )
+    ElMessage.success('已创建')
+    createVisible.value = false
+    pageResult.pageNum = 1
+    await loadUsers()
+  } catch (error) {
+    ElMessage.error(errorMessage(error))
+  } finally {
+    creating.value = false
+  }
+}
+
 function openEdit(row: AdminUserVo) {
   if (row.id == null) {
     return
@@ -179,6 +273,7 @@ function openEdit(row: AdminUserVo) {
   editForm.username = row.username ?? ''
   editForm.avatar = row.avatar ?? ''
   editForm.bio = row.bio ?? ''
+  editForm.role = row.role === 'admin' ? 'admin' : 'user'
   editForm.userPassword = ''
   editVisible.value = true
   void nextTick(() => editFormRef.value?.clearValidate())
@@ -197,6 +292,7 @@ async function submitEdit() {
     username: editForm.username ?? '',
     avatar: editForm.avatar ?? '',
     bio: editForm.bio ?? '',
+    role: editForm.role,
   }
   if (editForm.userPassword) {
     body.userPassword = editForm.userPassword
@@ -267,6 +363,7 @@ onMounted(() => {
         <el-form-item class="search-actions">
           <el-button type="primary" native-type="submit">查询</el-button>
           <el-button @click="onReset">重置</el-button>
+          <el-button type="primary" @click="openCreate">新建</el-button>
         </el-form-item>
       </el-form>
 
@@ -311,6 +408,43 @@ onMounted(() => {
         </div>
       </div>
 
+      <el-dialog v-model="createVisible" title="新建用户" width="480px">
+        <el-form ref="createFormRef" :model="createForm" :rules="createRules" label-width="88px">
+          <el-form-item label="账号" prop="userAccount">
+            <el-input v-model="createForm.userAccount" maxlength="32" placeholder="请输入账号" clearable />
+          </el-form-item>
+          <el-form-item label="密码" prop="userPassword">
+            <el-input v-model="createForm.userPassword" type="password" maxlength="64" show-password placeholder="请输入密码" />
+          </el-form-item>
+          <el-form-item label="确认密码" prop="confirmPassword">
+            <el-input v-model="createForm.confirmPassword" type="password" maxlength="64" show-password placeholder="请再次输入密码" />
+          </el-form-item>
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="createForm.username" maxlength="32" placeholder="请输入用户名" clearable />
+          </el-form-item>
+          <el-form-item label="头像" prop="avatar">
+            <el-input v-model="createForm.avatar" maxlength="1024" placeholder="请输入头像地址" clearable />
+          </el-form-item>
+          <el-form-item label="简介" prop="bio">
+            <el-input v-model="createForm.bio" type="textarea" maxlength="512" placeholder="请输入简介" />
+          </el-form-item>
+          <el-form-item label="角色" prop="role">
+            <el-select v-model="createForm.role" class="edit-select">
+              <el-option
+                v-for="item in roleOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <el-button @click="createVisible = false">取消</el-button>
+          <el-button type="primary" :loading="creating" @click="submitCreate">创建</el-button>
+        </template>
+      </el-dialog>
+
       <el-dialog v-model="editVisible" title="编辑用户" width="480px">
         <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="72px">
           <el-form-item label="账号">
@@ -324,6 +458,16 @@ onMounted(() => {
           </el-form-item>
           <el-form-item label="简介" prop="bio">
             <el-input v-model="editForm.bio" type="textarea" maxlength="512" placeholder="请输入简介" />
+          </el-form-item>
+          <el-form-item label="角色" prop="role">
+            <el-select v-model="editForm.role" class="edit-select">
+              <el-option
+                v-for="item in roleOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item label="密码" prop="userPassword">
             <el-input
@@ -360,7 +504,8 @@ onMounted(() => {
 }
 
 .search-input,
-.search-select {
+.search-select,
+.edit-select {
   width: 200px;
 }
 

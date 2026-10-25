@@ -8,6 +8,7 @@ export type AdminUserUpdateRequest = {
     username?: string;
     avatar?: string;
     bio?: string;
+    role?: string;
     userPassword?: string;
 };
 
@@ -26,6 +27,16 @@ export type BaseResponseAdminUserVo = {
     code?: number;
     message?: string;
     data?: AdminUserVo;
+};
+
+export type AdminUserCreateRequest = {
+    userAccount: string;
+    userPassword: string;
+    confirmPassword: string;
+    username?: string;
+    avatar?: string;
+    bio?: string;
+    role?: string;
 };
 
 export type RegisterRequest = {
@@ -124,6 +135,22 @@ export type UpdateResponses = {
 };
 
 export type UpdateResponse = UpdateResponses[keyof UpdateResponses];
+
+export type CreateData = {
+    body: AdminUserCreateRequest;
+    path?: never;
+    query?: never;
+    url: '/user';
+};
+
+export type CreateResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponseAdminUserVo;
+};
+
+export type CreateResponse = CreateResponses[keyof CreateResponses];
 
 export type RegisterData = {
     body: RegisterRequest;
