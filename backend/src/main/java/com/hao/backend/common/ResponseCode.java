@@ -24,6 +24,7 @@ public enum ResponseCode {
     SERVICE_UNAVAILABLE(50002, "服务不可用"),
     GATEWAY_TIMEOUT(50003, "网络超时"),
     REQUEST_ERROR(50005,"请求错误"),
+    SYSTEM_ERROR(50006, "系统错误"),
     
     PARAMS_ERROR(40010, "参数错误"),
     ;

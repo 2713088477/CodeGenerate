@@ -34,3 +34,9 @@ build/
 
 ### Logs ###
 logs/
+
+### 私钥配置 ###
+application-local.yaml
+
+### 生成的代码目录 ###
+tmp

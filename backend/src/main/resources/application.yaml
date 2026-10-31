@@ -6,7 +6,20 @@ spring:
     username: root
     password: 1234 # 修改为你的密码
     driver-class-name: com.mysql.cj.jdbc.Driver
+  profiles:
+    active: local #开发过程中在local中配置私钥文件，不上传到仓库
 server:
   port: 8123
   servlet:
     context-path: /api
+langchain4j:
+  open-ai:
+    chat-model:
+      base-url: https://api.deepseek.com
+      api-key: {API_KEY} # 修改为你的api_key
+      model-name: deepseek-flash # 实际模型: DeepSeek-V4.1-Flash-1017 参考: https://api-docs.deepseek.com/zh-cn/quick_start/pricing
+      max-tokens: 10000
+      response-format: json_object # 严格按照json格式输出，参考: https://api-docs.deepseek.com/zh-cn/guides/json_mode
+      max-retries: 2 # 最多重试2次
+      log-requests: true
+      log-responses: true
