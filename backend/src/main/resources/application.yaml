@@ -16,10 +16,26 @@ langchain4j:
   open-ai:
     chat-model:
       base-url: https://api.deepseek.com
-      api-key: {API_KEY} # 修改为你的api_key
+      api-key: ${API_KEY} # 修改为你的api_key
       model-name: deepseek-flash # 实际模型: DeepSeek-V4.1-Flash-1017 参考: https://api-docs.deepseek.com/zh-cn/quick_start/pricing
-      max-tokens: 10000
+      max-tokens: 30000
       response-format: json_object # 严格按照json格式输出，参考: https://api-docs.deepseek.com/zh-cn/guides/json_mode
       max-retries: 2 # 最多重试2次
+      timeout: 300s # 默认60秒，生成长代码会超时
+      custom-parameters:
+        thinking:
+          type: disabled # 关闭思考模式，参考: https://api-docs.deepseek.com/zh-cn/guides/thinking_mode
+      log-requests: true
+      log-responses: true
+    streaming-chat-model:
+      base-url: https://api.deepseek.com
+      api-key: ${API_KEY} # 修改为你的api_key
+      model-name: deepseek-flash # 实际模型: DeepSeek-V4.1-Flash-1017 参考: https://api-docs.deepseek.com/zh-cn/quick_start/pricing
+      max-tokens: 30000
+      response-format: json_object # 流式也用json模式。LangChain4j流式不支持返回POJO，所以流结束后由Facade自己解析JSON
+      timeout: 300s # 默认60秒，生成长代码会超时
+      custom-parameters:
+        thinking:
+          type: disabled # 关闭思考模式，参考: https://api-docs.deepseek.com/zh-cn/guides/thinking_mode
       log-requests: true
       log-responses: true

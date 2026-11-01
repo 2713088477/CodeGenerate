@@ -1,6 +1,7 @@
 package com.hao.backend.ai;
 
 import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.StreamingChatModel;
 import dev.langchain4j.service.AiServices;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
@@ -12,8 +13,15 @@ public class AICodeGenServiceFactory {
     @Resource
     private ChatModel chatModel;
 
+    @Resource 
+    private StreamingChatModel streamingChatModel;
+
     @Bean
     public AICodeGenService codeGenService(){
-        return AiServices.create(AICodeGenService.class,chatModel);
+        return AiServices.builder(AICodeGenService.class)
+            .chatModel(chatModel)
+            .streamingChatModel(streamingChatModel)
+            .build();
     }
+
 }

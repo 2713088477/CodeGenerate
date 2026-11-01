@@ -20,7 +20,7 @@ class AICodeGenServiceTest {
 
     @Test
     void generateMultiFileCode() {
-        MultiFileCodeResult result = codeGenService.generateMultiFileCode("生成一个的博客网站，三个文件不超过200行代码");
+        MultiFileCodeResult result = codeGenService.generateMultiFileCode("生成一个的博客网站。更可能的代码简单");
         System.out.println(result);
     }
 
