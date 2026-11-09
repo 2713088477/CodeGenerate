@@ -1,9 +1,9 @@
 package com.hao.backend.service;
 
 import com.hao.backend.common.PageResult;
-import com.hao.backend.model.dto.AdminUserCreateRequest;
-import com.hao.backend.model.dto.AdminUserUpdateRequest;
-import com.hao.backend.model.dto.UserQueryRequest;
+import com.hao.backend.model.dto.user.AdminUserCreateRequest;
+import com.hao.backend.model.dto.user.AdminUserUpdateRequest;
+import com.hao.backend.model.dto.user.UserQueryRequest;
 import com.hao.backend.model.entity.User;
 import com.hao.backend.model.vo.AdminUserVO;
 import com.mybatisflex.core.service.IService;

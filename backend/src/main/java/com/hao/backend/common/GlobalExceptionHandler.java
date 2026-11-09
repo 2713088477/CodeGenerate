@@ -2,6 +2,7 @@ package com.hao.backend.common;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,6 +30,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     public BaseResponse<?> handleAuthenticationException(AuthenticationException e) {
         return new BaseResponse<>(ResponseCode.UNAUTHORIZED.getCode(), "账号或密码错误", null);
+    }
+
+    /**
+     * @PreAuthorize 等方法级权限校验失败
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public BaseResponse<?> handleAccessDeniedException(AccessDeniedException e) {
+        return new BaseResponse<>(ResponseCode.FORBIDDEN.getCode(), ResponseCode.FORBIDDEN.getMessage(), null);
     }
 
     @ExceptionHandler(Exception.class)

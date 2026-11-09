@@ -1,4 +1,4 @@
-package com.hao.backend.model.dto;
+package com.hao.backend.model.dto.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

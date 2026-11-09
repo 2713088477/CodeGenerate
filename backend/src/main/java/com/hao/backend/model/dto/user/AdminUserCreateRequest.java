@@ -1,4 +1,4 @@
-package com.hao.backend.model.dto;
+package com.hao.backend.model.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.AssertTrue;
@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class RegisterRequest {
+public class AdminUserCreateRequest {
 
     @NotBlank(message = "账号不能为空")
     @Size(max = 32, message = "账号长度不能超过 32")
@@ -19,6 +19,17 @@ public class RegisterRequest {
 
     @NotBlank(message = "确认密码不能为空")
     private String confirmPassword;
+
+    @Size(max = 32, message = "用户名长度不能超过 32")
+    private String username;
+
+    @Size(max = 1024, message = "头像地址长度不能超过 1024")
+    private String avatar;
+
+    @Size(max = 512, message = "个人简介长度不能超过 512")
+    private String bio;
+
+    private String role;
 
     @JsonIgnore
     @AssertTrue(message = "两次密码不一致")

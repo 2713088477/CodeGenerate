@@ -1,4 +1,4 @@
-package com.hao.backend.model.dto;
+package com.hao.backend.model.dto.user;
 
 import com.hao.backend.common.PageQuery;
 import lombok.Data;

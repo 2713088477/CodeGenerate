@@ -1,8 +1,8 @@
 package com.hao.backend.controller;
 
 import com.hao.backend.common.BaseResponse;
-import com.hao.backend.model.dto.LoginRequest;
-import com.hao.backend.model.dto.RegisterRequest;
+import com.hao.backend.model.dto.auth.LoginRequest;
+import com.hao.backend.model.dto.auth.RegisterRequest;
 import com.hao.backend.model.vo.UserProfileVO;
 import com.hao.backend.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;

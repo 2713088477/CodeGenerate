@@ -12,13 +12,14 @@ import java.io.IOException;
 public class MybatisFlexCodegen {
 
     private static final String BASE_PACKAGE = "com.hao.backend.codegen";
-    private static final String[] TABLES = {"user"};
+    // 改为自己需要生成的数据库的表名
+    private static final String[] TABLES = {"app"};
 
     public static void main(String[] args) throws IOException {
         //读取yaml的配置文件,获取到数据库的连接信息
         PropertySource<?> source = new YamlPropertySourceLoader()
                 .load("application", new ClassPathResource("application.yaml"))
-                .get(0);
+                .getFirst();
 
         //配置数据源
         HikariDataSource dataSource = new HikariDataSource();

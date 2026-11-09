@@ -2,9 +2,9 @@ package com.hao.backend.controller;
 
 import com.hao.backend.common.BaseResponse;
 import com.hao.backend.common.PageResult;
-import com.hao.backend.model.dto.AdminUserCreateRequest;
-import com.hao.backend.model.dto.AdminUserUpdateRequest;
-import com.hao.backend.model.dto.UserQueryRequest;
+import com.hao.backend.model.dto.user.AdminUserCreateRequest;
+import com.hao.backend.model.dto.user.AdminUserUpdateRequest;
+import com.hao.backend.model.dto.user.UserQueryRequest;
 import com.hao.backend.model.vo.AdminUserVO;
 import com.hao.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Parameter;

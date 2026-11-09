@@ -2,8 +2,8 @@ package com.hao.backend.service.impl;
 
 import com.hao.backend.common.BusinessException;
 import com.hao.backend.common.ResponseCode;
-import com.hao.backend.model.dto.LoginRequest;
-import com.hao.backend.model.dto.RegisterRequest;
+import com.hao.backend.model.dto.auth.LoginRequest;
+import com.hao.backend.model.dto.auth.RegisterRequest;
 import com.hao.backend.model.vo.UserProfileVO;
 import com.hao.backend.model.entity.User;
 import com.hao.backend.model.enums.UserRole;
@@ -70,6 +70,20 @@ public class AuthServiceImpl implements AuthService {
     public void logout(HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         logoutHandler.logout(httpRequest, httpResponse, authentication);
+    }
+
+    @Override
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof LoginUser loginUser)) {
+            throw new BusinessException(ResponseCode.UNAUTHORIZED);
+        }
+        // session 里存的是登录时的快照，这里按 id 重新查库，拿最新数据，也能识别用户已被删除的情况
+        User user = userService.getById(loginUser.getUser().getId());
+        if (user == null) {
+            throw new BusinessException(ResponseCode.UNAUTHORIZED, "用户不存在或已被删除");
+        }
+        return user;
     }
 
     private UserProfileVO establishSession(String userAccount, String rawPassword, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
