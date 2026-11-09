@@ -1,9 +1,14 @@
 package com.hao.backend.service;
 
+import com.hao.backend.common.PageResult;
+import com.hao.backend.model.dto.app.AdminAppQueryRequest;
 import com.hao.backend.model.dto.app.AdminAppUpdateRequest;
 import com.hao.backend.model.dto.app.AppCreateRequest;
+import com.hao.backend.model.dto.app.AppQueryRequest;
 import com.hao.backend.model.dto.app.AppUpdateRequest;
 import com.hao.backend.model.entity.App;
+import com.hao.backend.model.vo.AdminAppVO;
+import com.hao.backend.model.vo.AppVO;
 import com.mybatisflex.core.service.IService;
 
 /**
@@ -35,4 +40,31 @@ public interface AppService extends IService<App> {
      * @param request 修改请求，至少传一项
      */
     void adminUpdateApp(Long id, AdminAppUpdateRequest request);
+
+    /**
+     * 用户分页查询自己的应用，可按应用名称（模糊）、部署标识（精确）筛选，默认按创建时间倒序
+     * @param query 查询条件
+     * @param userId 当前用户 id
+     */
+    PageResult<AppVO> pageMyApps(AppQueryRequest query, Long userId);
+
+    /**
+     * 管理员分页查询所有应用，可按创建者账号（模糊）、应用名称（模糊）、代码生成类型（精确）筛选，
+     * 默认按优先级升序（精选在前）、创建时间倒序
+     * @param query 查询条件
+     */
+    PageResult<AdminAppVO> pageAllApps(AdminAppQueryRequest query);
+
+    /**
+     * 用户删除自己的应用（逻辑删除）
+     * @param id 应用 id
+     * @param userId 当前用户 id，必须是应用的创建者
+     */
+    void deleteMyApp(Long id, Long userId);
+
+    /**
+     * 管理员删除任意应用（逻辑删除）
+     * @param id 应用 id
+     */
+    void adminDeleteApp(Long id);
 }
