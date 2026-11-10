@@ -38,13 +38,10 @@ public class AppController {
     private final AppService appService;
     private final AuthService authService;
 
-    /**
-     * 返回的 id 是雪花 id（19 位），超出 JS 安全整数范围，所以以字符串形式返回。
-     */
     @PostMapping("/add")
-    public BaseResponse<String> addApp(@RequestBody @Valid AppCreateRequest request) {
+    public BaseResponse<Long> addApp(@RequestBody @Valid AppCreateRequest request) {
         Long appId = appService.createApp(request, authService.getCurrentUser().getId());
-        return BaseResponse.success(String.valueOf(appId));
+        return BaseResponse.success(appId);
     }
 
     @GetMapping("/my/page")

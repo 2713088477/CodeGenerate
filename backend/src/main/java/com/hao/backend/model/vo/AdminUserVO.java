@@ -1,6 +1,5 @@
 package com.hao.backend.model.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hao.backend.model.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -12,7 +11,6 @@ import java.time.LocalDateTime;
 public class AdminUserVO {
 
     @Schema(type = "string")
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long id;
     private String userAccount;
     private String username;

@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import org.springframework.beans.BeanUtils;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hao.backend.constant.AppPriority;
 import com.hao.backend.model.entity.App;
 
@@ -18,7 +17,6 @@ import lombok.Data;
 public class AdminAppVO {
 
     @Schema(type = "string")
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long id;
     private String appName;
     private String cover;
@@ -33,7 +31,6 @@ public class AdminAppVO {
     private Boolean featured;
 
     @Schema(type = "string")
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Long userId;
     /**
      * 创建者账号，创建者已被删除时为 null
