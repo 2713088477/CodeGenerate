@@ -3,6 +3,7 @@ package com.hao.backend.service;
 import com.hao.backend.common.PageResult;
 import com.hao.backend.model.dto.app.AdminAppQueryRequest;
 import com.hao.backend.model.dto.app.AdminAppUpdateRequest;
+import com.hao.backend.model.dto.app.AppChatRequest;
 import com.hao.backend.model.dto.app.AppCreateRequest;
 import com.hao.backend.model.dto.app.AppQueryRequest;
 import com.hao.backend.model.dto.app.AppUpdateRequest;
@@ -10,6 +11,7 @@ import com.hao.backend.model.entity.App;
 import com.hao.backend.model.vo.AdminAppVO;
 import com.hao.backend.model.vo.AppVO;
 import com.mybatisflex.core.service.IService;
+import reactor.core.publisher.Flux;
 
 /**
  * 应用表 服务层。
@@ -67,4 +69,12 @@ public interface AppService extends IService<App> {
      * @param id 应用 id
      */
     void adminDeleteApp(Long id);
+
+    /**
+     * 创建者通过对话流式生成代码。应用不存在或不是当前用户创建的，直接拒绝。
+     * @param request 应用 id 和用户消息
+     * @param userId 当前用户 id，必须是应用的创建者
+     * @return 模型输出的文本片段
+     */
+    Flux<String> chatToGenCode(AppChatRequest request, Long userId);
 }

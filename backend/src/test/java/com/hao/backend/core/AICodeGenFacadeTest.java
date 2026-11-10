@@ -24,7 +24,7 @@ class AICodeGenFacadeTest {
     void testHtmlCodeGen() {
         String userMessage = "生成一个简单的HTML页面，不超过300行";
         CodeGenTypeEnum codeGenType = CodeGenTypeEnum.HTML;
-        Path path = aiCodeGenFacade.generateAndSaveCode(userMessage, codeGenType);
+        Path path = aiCodeGenFacade.generateAndSaveCode(userMessage, codeGenType, 1L);
         System.out.println(path);
     }
 
@@ -32,7 +32,7 @@ class AICodeGenFacadeTest {
     void testMultiFileCodeGen() {
         String userMessage = "生成一个简单的博客网站，三个文件不超过500行";
         CodeGenTypeEnum codeGenType = CodeGenTypeEnum.MULTI_FILE;
-        Path path = aiCodeGenFacade.generateAndSaveCode(userMessage, codeGenType);
+        Path path = aiCodeGenFacade.generateAndSaveCode(userMessage, codeGenType, 1L);
         System.out.println(path);
     }
 
@@ -40,7 +40,7 @@ class AICodeGenFacadeTest {
     void testHtmlCodeGenStream() {
         String userMessage = "生成一个记录食物卡路里的网站，不超过700行";
         CodeGenTypeEnum codeGenType = CodeGenTypeEnum.HTML;
-        Flux<String> flux = aiCodeGenFacade.generateAndSaveCodeStream(userMessage, codeGenType);
+        Flux<String> flux = aiCodeGenFacade.generateAndSaveCodeStream(userMessage, codeGenType, 1L);
         //阻塞直到flux完成
         flux.blockLast();
     }
@@ -49,7 +49,7 @@ class AICodeGenFacadeTest {
     void testMultiFileCodeGenStream() {
         String userMessage = "给我生成一个让人眼前一亮，炫酷的网站，不超过1000行";
         CodeGenTypeEnum codeGenType = CodeGenTypeEnum.MULTI_FILE;
-        Flux<String> flux = aiCodeGenFacade.generateAndSaveCodeStream(userMessage, codeGenType);
+        Flux<String> flux = aiCodeGenFacade.generateAndSaveCodeStream(userMessage, codeGenType, 1L);
         
         // 收集所有的chunk,拼接成完整输出
         List<String> chunks = flux.collectList().block(Duration.ofMinutes(5));

@@ -4,6 +4,7 @@ import com.hao.backend.common.BaseResponse;
 import com.hao.backend.common.PageResult;
 import com.hao.backend.model.dto.app.AdminAppQueryRequest;
 import com.hao.backend.model.dto.app.AdminAppUpdateRequest;
+import com.hao.backend.model.dto.app.AppChatRequest;
 import com.hao.backend.model.dto.app.AppCreateRequest;
 import com.hao.backend.model.dto.app.AppQueryRequest;
 import com.hao.backend.model.dto.app.AppUpdateRequest;
@@ -15,6 +16,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 
 /**
  * 应用表 控制层。
@@ -83,5 +86,13 @@ public class AppController {
     public BaseResponse<Void> adminDeleteApp(@Parameter(schema = @Schema(type = "string")) @PathVariable Long id) {
         appService.adminDeleteApp(id);
         return BaseResponse.success();
+    }
+
+    /**
+     * 创建者对话生成代码，以 SSE 流式返回模型输出。
+     */
+    @PostMapping(value = "/chat/gen", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> chatToGenCode(@RequestBody @Valid AppChatRequest request) {
+        return appService.chatToGenCode(request, authService.getCurrentUser().getId());
     }
 }

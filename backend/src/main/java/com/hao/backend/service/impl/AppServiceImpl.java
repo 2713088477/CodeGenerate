@@ -1,5 +1,6 @@
 package com.hao.backend.service.impl;
 
+import com.hao.backend.core.AICodeGenFacade;
 import com.hao.backend.common.PageQuery;
 import com.hao.backend.common.PageResult;
 import com.hao.backend.common.ResponseCode;
@@ -8,6 +9,7 @@ import com.hao.backend.constant.AppPriority;
 import com.hao.backend.mapper.AppMapper;
 import com.hao.backend.model.dto.app.AdminAppQueryRequest;
 import com.hao.backend.model.dto.app.AdminAppUpdateRequest;
+import com.hao.backend.model.dto.app.AppChatRequest;
 import com.hao.backend.model.dto.app.AppCreateRequest;
 import com.hao.backend.model.dto.app.AppQueryRequest;
 import com.hao.backend.model.dto.app.AppUpdateRequest;
@@ -19,6 +21,7 @@ import com.hao.backend.model.vo.AppVO;
 import com.hao.backend.service.AppService;
 import com.hao.backend.service.UserService;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryMethods;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.core.util.LambdaGetter;
@@ -26,6 +29,7 @@ import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +45,7 @@ import java.util.stream.Collectors;
 public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppService {
 
     private final UserService userService;
+    private final AICodeGenFacade aiCodeGenFacade;
 
     private static final Map<String, LambdaGetter<App>> SORT_FIELDS = Map.of(
             "id", App::getId,
@@ -133,7 +138,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
         if (userAccount != null) {
             // 按创建者账号模糊查：子查询找出匹配的用户 id，再按 userId 过滤
             queryWrapper.in(App::getUserId, QueryWrapper.create()
-                    .select(User::getId)
+                    .select(QueryMethods.column(User::getId))
                     .from(User.class)
                     .like(User::getUserAccount, userAccount));
         }
@@ -184,6 +189,18 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
             queryWrapper.orderBy(column, Boolean.TRUE.equals(query.getAsc()));
         }
         queryWrapper.orderBy(App::getId, false);
+    }
+
+    @Override
+    public Flux<String> chatToGenCode(AppChatRequest request, Long userId) {
+        ThrowUtil.throwIf(userId == null, ResponseCode.UNAUTHORIZED);
+        App app = getExistingApp(request.getAppId());
+        ThrowUtil.throwIf(!app.getUserId().equals(userId), ResponseCode.FORBIDDEN, "无权访问该应用");
+        CodeGenTypeEnum codeGenType = CodeGenTypeEnum.fromValue(app.getCodeGenType());
+        ThrowUtil.throwIf(codeGenType == null, ResponseCode.SYSTEM_ERROR, "代码生成类型不正确");
+        String message = StringUtils.trimToNull(request.getMessage());
+        ThrowUtil.throwIf(message == null, ResponseCode.PARAMS_ERROR, "消息不能为空");
+        return aiCodeGenFacade.generateAndSaveCodeStream(message, codeGenType, app.getId());
     }
 
     private App getExistingApp(Long id) {
