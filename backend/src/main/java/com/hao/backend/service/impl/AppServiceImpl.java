@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +47,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
 
     private final UserService userService;
     private final AICodeGenFacade aiCodeGenFacade;
+    private final JsonMapper jsonMapper;
 
     private static final Map<String, LambdaGetter<App>> SORT_FIELDS = Map.of(
             "id", App::getId,
@@ -200,7 +202,12 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
         ThrowUtil.throwIf(codeGenType == null, ResponseCode.SYSTEM_ERROR, "代码生成类型不正确");
         String message = StringUtils.trimToNull(request.getMessage());
         ThrowUtil.throwIf(message == null, ResponseCode.PARAMS_ERROR, "消息不能为空");
-        return aiCodeGenFacade.generateAndSaveCodeStream(message, codeGenType, app.getId());
+        // 包成 {"v":"..."} 再交给 SSE。浏览器会删掉 data 字段值开头的一个空格，模型片段经常以空格开头。
+        return aiCodeGenFacade.generateAndSaveCodeStream(message, codeGenType, app.getId())
+                .map(chunk -> jsonMapper.writeValueAsString(new SseChunk(chunk)));
+    }
+
+    private record SseChunk(String v) {
     }
 
     private App getExistingApp(Long id) {

@@ -89,7 +89,7 @@ public class AppController {
     }
 
     /**
-     * 创建者对话生成代码，以 SSE 流式返回模型输出。
+     * 创建者对话生成代码，以 SSE 流式返回。
      */
     @PostMapping(value = "/chat/gen", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> chatToGenCode(@RequestBody @Valid AppChatRequest request) {

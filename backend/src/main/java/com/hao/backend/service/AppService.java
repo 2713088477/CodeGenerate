@@ -74,7 +74,7 @@ public interface AppService extends IService<App> {
      * 创建者通过对话流式生成代码。应用不存在或不是当前用户创建的，直接拒绝。
      * @param request 应用 id 和用户消息
      * @param userId 当前用户 id，必须是应用的创建者
-     * @return 模型输出的文本片段
+     * @return SSE 片段，每段是 {"v":"模型输出"} 的 JSON 文本，避免开头空格丢失问题
      */
     Flux<String> chatToGenCode(AppChatRequest request, Long userId);
 }
