@@ -12,6 +12,8 @@ server:
   port: 8123
   servlet:
     context-path: /api
+app:
+  deploy-url-prefix: http://localhost/deploy/ # 部署后的访问地址前缀，对应 Nginx 的 /deploy/，以 / 结尾
 langchain4j:
   open-ai:
     chat-model:

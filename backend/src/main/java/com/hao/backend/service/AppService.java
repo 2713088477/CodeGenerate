@@ -77,4 +77,13 @@ public interface AppService extends IService<App> {
      * @return SSE 片段，每段是 {"v":"模型输出"} 的 JSON 文本，避免开头空格丢失问题
      */
     Flux<String> chatToGenCode(AppChatRequest request, Long userId);
+
+    /**
+     * 部署应用：把代码生成目录复制到部署目录，由 Nginx 对外提供访问。
+     * 首次部署生成 deployKey 写库，重新部署复用原 deployKey，并刷新部署时间。
+     * @param id 应用 id
+     * @param userId 当前用户 id，必须是应用的创建者
+     * @return 应用的访问 URL
+     */
+    String deployApp(Long id, Long userId);
 }

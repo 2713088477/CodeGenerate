@@ -89,6 +89,14 @@ public class AppController {
     }
 
     /**
+     * 部署应用，返回访问 URL。
+     */
+    @PostMapping("/deploy/{id}")
+    public BaseResponse<String> deployApp(@Parameter(schema = @Schema(type = "string")) @PathVariable Long id) {
+        return BaseResponse.success(appService.deployApp(id, authService.getCurrentUser().getId()));
+    }
+
+    /**
      * 创建者对话生成代码，以 SSE 流式返回。
      */
     @PostMapping(value = "/chat/gen", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

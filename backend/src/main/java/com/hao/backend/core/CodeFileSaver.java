@@ -9,6 +9,7 @@ import com.hao.backend.ai.model.HtmlCodeResult;
 import com.hao.backend.ai.model.MultiFileCodeResult;
 import com.hao.backend.common.BusinessException;
 import com.hao.backend.common.ResponseCode;
+import com.hao.backend.constant.AppConstant;
 import com.hao.backend.model.enums.CodeGenTypeEnum;
 
 /**
@@ -17,9 +18,16 @@ import com.hao.backend.model.enums.CodeGenTypeEnum;
  */
 public class CodeFileSaver {
 
-    private static final String FILE_SAVE_ROOT_DIR = System.getProperty("user.dir") + "/tmp/code_output";
+    private static final String FILE_SAVE_ROOT_DIR = AppConstant.CODE_OUTPUT_ROOT_DIR;
 
     private CodeFileSaver() {
+    }
+
+    /**
+     * 获取某个应用代码生成目录的路径，只拼路径，不创建目录
+     */
+    public static Path getCodeDir(CodeGenTypeEnum type, Long appId) {
+        return Path.of(FILE_SAVE_ROOT_DIR, type.getValue() + "_" + appId);
     }
 
     /**
@@ -59,7 +67,7 @@ public class CodeFileSaver {
         if (appId == null) {
             throw new BusinessException(ResponseCode.PARAMS_ERROR, "应用id不能为空");
         }
-        Path dir = Path.of(FILE_SAVE_ROOT_DIR, type.getValue() + "_" + appId);
+        Path dir = getCodeDir(type, appId);
         try {
             Files.createDirectories(dir);
         } catch (IOException e) {

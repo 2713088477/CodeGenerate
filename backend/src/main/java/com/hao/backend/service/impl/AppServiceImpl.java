@@ -1,6 +1,9 @@
 package com.hao.backend.service.impl;
 
+import com.hao.backend.common.BusinessException;
 import com.hao.backend.core.AICodeGenFacade;
+import com.hao.backend.core.CodeDeployer;
+import com.hao.backend.core.CodeFileSaver;
 import com.hao.backend.common.PageQuery;
 import com.hao.backend.common.PageResult;
 import com.hao.backend.common.ResponseCode;
@@ -27,11 +30,16 @@ import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.core.util.LambdaGetter;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import tools.jackson.databind.json.JsonMapper;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -48,6 +56,14 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
     private final UserService userService;
     private final AICodeGenFacade aiCodeGenFacade;
     private final JsonMapper jsonMapper;
+
+    /** 部署后的访问地址前缀，对应 Nginx 的 /deploy/ 路径，以 / 结尾 */
+    @Value("${app.deploy-url-prefix:http://localhost/deploy/}")
+    private String deployUrlPrefix;
+
+    private static final int DEPLOY_KEY_LENGTH = 6;
+    private static final String DEPLOY_KEY_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
+    private static final int DEPLOY_KEY_MAX_RETRY = 10;
 
     private static final Map<String, LambdaGetter<App>> SORT_FIELDS = Map.of(
             "id", App::getId,
@@ -208,6 +224,46 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
     }
 
     private record SseChunk(String v) {
+    }
+
+    @Override
+    public String deployApp(Long id, Long userId) {
+        ThrowUtil.throwIf(userId == null, ResponseCode.UNAUTHORIZED);
+        App app = getExistingApp(id);
+        ThrowUtil.throwIf(!app.getUserId().equals(userId), ResponseCode.FORBIDDEN, "无权部署该应用");
+        CodeGenTypeEnum codeGenType = CodeGenTypeEnum.fromValue(app.getCodeGenType());
+        ThrowUtil.throwIf(codeGenType == null, ResponseCode.SYSTEM_ERROR, "代码生成类型不正确");
+        Path sourceDir = CodeFileSaver.getCodeDir(codeGenType, id);
+        ThrowUtil.throwIf(!Files.isDirectory(sourceDir), ResponseCode.PARAMS_ERROR, "应用还没有生成代码，请先生成代码");
+
+        // 已部署过就复用原来的 key，重新部署时访问链接不变
+        String deployKey = app.getDeployKey();
+        boolean newKey = deployKey == null;
+        if (newKey) {
+            deployKey = generateDeployKey();
+        }
+        CodeDeployer.deploy(sourceDir, deployKey);
+
+        UpdateChain.of(App.class)
+                .set(App::getDeployKey, deployKey, newKey)
+                .set(App::getDeployedTime, LocalDateTime.now())
+                .where(App::getId).eq(id)
+                .update();
+        return deployUrlPrefix + deployKey + "/";
+    }
+
+    /**
+     * 生成唯一的部署标识：6 位小写字母加数字，和库里已有的重复就重新生成。
+     */
+    private String generateDeployKey() {
+        for (int i = 0; i < DEPLOY_KEY_MAX_RETRY; i++) {
+            String key = RandomStringUtils.secure().next(DEPLOY_KEY_LENGTH, DEPLOY_KEY_CHARS);
+            boolean exists = queryChain().where(App::getDeployKey).eq(key).exists();
+            if (!exists) {
+                return key;
+            }
+        }
+        throw new BusinessException(ResponseCode.INTERNAL_SERVER_ERROR, "生成部署标识失败，请重试");
     }
 
     private App getExistingApp(Long id) {
