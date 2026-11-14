@@ -29,6 +29,21 @@ export type BaseResponseAdminUserVo = {
     data?: AdminUserVo;
 };
 
+export type AppUpdateRequest = {
+    appName: string;
+};
+
+export type BaseResponseVoid = {
+    code?: number;
+    message?: string;
+    data?: unknown;
+};
+
+export type AdminAppUpdateRequest = {
+    appName?: string;
+    priority?: number;
+};
+
 export type AdminUserCreateRequest = {
     userAccount: string;
     userPassword: string;
@@ -59,15 +74,30 @@ export type UserProfileVo = {
     role?: string;
 };
 
-export type BaseResponseVoid = {
-    code?: number;
-    message?: string;
-    data?: unknown;
-};
-
 export type LoginRequest = {
     userAccount: string;
     userPassword: string;
+};
+
+export type BaseResponseString = {
+    code?: number;
+    message?: string;
+    data?: string;
+};
+
+export type AppChatRequest = {
+    appId: string;
+    message: string;
+};
+
+export type AppCreateRequest = {
+    initPrompt: string;
+};
+
+export type BaseResponseLong = {
+    code?: number;
+    message?: string;
+    data?: number;
 };
 
 export type UserQueryRequest = {
@@ -94,10 +124,79 @@ export type PageResultAdminUserVo = {
     totalPage?: number;
 };
 
-export type BaseResponseString = {
+export type AppQueryRequest = {
+    pageNum?: number;
+    pageSize?: number;
+    sortField?: string;
+    asc?: boolean;
+    appName?: string;
+    deployKey?: string;
+};
+
+export type AppVo = {
+    id?: string;
+    appName?: string;
+    cover?: string;
+    initPrompt?: string;
+    codeGenType?: string;
+    deployKey?: string;
+    deployedTime?: string;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
+export type BaseResponsePageResultAppVo = {
     code?: number;
     message?: string;
-    data?: string;
+    data?: PageResultAppVo;
+};
+
+export type PageResultAppVo = {
+    records?: Array<AppVo>;
+    pageNum?: number;
+    pageSize?: number;
+    total?: number;
+    totalPage?: number;
+};
+
+export type AdminAppQueryRequest = {
+    pageNum?: number;
+    pageSize?: number;
+    sortField?: string;
+    asc?: boolean;
+    userAccount?: string;
+    appName?: string;
+    codeGenType?: string;
+};
+
+export type AdminAppVo = {
+    id?: string;
+    appName?: string;
+    cover?: string;
+    initPrompt?: string;
+    codeGenType?: string;
+    deployKey?: string;
+    deployedTime?: string;
+    priority?: number;
+    featured?: boolean;
+    userId?: string;
+    userAccount?: string;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
+export type BaseResponsePageResultAdminAppVo = {
+    code?: number;
+    message?: string;
+    data?: PageResultAdminAppVo;
+};
+
+export type PageResultAdminAppVo = {
+    records?: Array<AdminAppVo>;
+    pageNum?: number;
+    pageSize?: number;
+    total?: number;
+    totalPage?: number;
 };
 
 export type DeleteData = {
@@ -135,6 +234,78 @@ export type UpdateResponses = {
 };
 
 export type UpdateResponse = UpdateResponses[keyof UpdateResponses];
+
+export type DeleteMyAppData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/app/{id}';
+};
+
+export type DeleteMyAppResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponseVoid;
+};
+
+export type DeleteMyAppResponse = DeleteMyAppResponses[keyof DeleteMyAppResponses];
+
+export type UpdateMyAppData = {
+    body: AppUpdateRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/app/{id}';
+};
+
+export type UpdateMyAppResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponseVoid;
+};
+
+export type UpdateMyAppResponse = UpdateMyAppResponses[keyof UpdateMyAppResponses];
+
+export type AdminDeleteAppData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/app/admin/{id}';
+};
+
+export type AdminDeleteAppResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponseVoid;
+};
+
+export type AdminDeleteAppResponse = AdminDeleteAppResponses[keyof AdminDeleteAppResponses];
+
+export type AdminUpdateAppData = {
+    body: AdminAppUpdateRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/app/admin/{id}';
+};
+
+export type AdminUpdateAppResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponseVoid;
+};
+
+export type AdminUpdateAppResponse = AdminUpdateAppResponses[keyof AdminUpdateAppResponses];
 
 export type CreateData = {
     body: AdminUserCreateRequest;
@@ -200,6 +371,56 @@ export type LoginResponses = {
 
 export type LoginResponse = LoginResponses[keyof LoginResponses];
 
+export type DeployAppData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/app/deploy/{id}';
+};
+
+export type DeployAppResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponseString;
+};
+
+export type DeployAppResponse = DeployAppResponses[keyof DeployAppResponses];
+
+export type ChatToGenCodeData = {
+    body: AppChatRequest;
+    path?: never;
+    query?: never;
+    url: '/app/chat/gen';
+};
+
+export type ChatToGenCodeResponses = {
+    /**
+     * OK
+     */
+    200: Array<string>;
+};
+
+export type ChatToGenCodeResponse = ChatToGenCodeResponses[keyof ChatToGenCodeResponses];
+
+export type AddAppData = {
+    body: AppCreateRequest;
+    path?: never;
+    query?: never;
+    url: '/app/add';
+};
+
+export type AddAppResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponseLong;
+};
+
+export type AddAppResponse = AddAppResponses[keyof AddAppResponses];
+
 export type PageData = {
     body?: never;
     path?: never;
@@ -233,3 +454,39 @@ export type PingResponses = {
 };
 
 export type PingResponse = PingResponses[keyof PingResponses];
+
+export type PageMyAppsData = {
+    body?: never;
+    path?: never;
+    query: {
+        query: AppQueryRequest;
+    };
+    url: '/app/my/page';
+};
+
+export type PageMyAppsResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponsePageResultAppVo;
+};
+
+export type PageMyAppsResponse = PageMyAppsResponses[keyof PageMyAppsResponses];
+
+export type PageAllAppsData = {
+    body?: never;
+    path?: never;
+    query: {
+        query: AdminAppQueryRequest;
+    };
+    url: '/app/admin/page';
+};
+
+export type PageAllAppsResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponsePageResultAdminAppVo;
+};
+
+export type PageAllAppsResponse = PageAllAppsResponses[keyof PageAllAppsResponses];

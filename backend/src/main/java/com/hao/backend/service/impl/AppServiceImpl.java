@@ -30,9 +30,11 @@ import com.mybatisflex.core.update.UpdateChain;
 import com.mybatisflex.core.util.LambdaGetter;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import tools.jackson.databind.json.JsonMapper;
@@ -49,6 +51,7 @@ import java.util.stream.Collectors;
  *
  * @author <a href="https://github.com/2713088477">艺艺生辉</a>
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppService {
@@ -210,7 +213,7 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
     }
 
     @Override
-    public Flux<String> chatToGenCode(AppChatRequest request, Long userId) {
+    public Flux<ServerSentEvent<String>> chatToGenCode(AppChatRequest request, Long userId) {
         ThrowUtil.throwIf(userId == null, ResponseCode.UNAUTHORIZED);
         App app = getExistingApp(request.getAppId());
         ThrowUtil.throwIf(!app.getUserId().equals(userId), ResponseCode.FORBIDDEN, "无权访问该应用");
@@ -218,9 +221,40 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
         ThrowUtil.throwIf(codeGenType == null, ResponseCode.SYSTEM_ERROR, "代码生成类型不正确");
         String message = StringUtils.trimToNull(request.getMessage());
         ThrowUtil.throwIf(message == null, ResponseCode.PARAMS_ERROR, "消息不能为空");
-        // 包成 {"v":"..."} 再交给 SSE。浏览器会删掉 data 字段值开头的一个空格，模型片段经常以空格开头。
-        return aiCodeGenFacade.generateAndSaveCodeStream(message, codeGenType, app.getId())
-                .map(chunk -> jsonMapper.writeValueAsString(new SseChunk(chunk)));
+        Long appId = app.getId();
+
+        // 开始事件：前端收到后表示请求已通过校验、开始生成
+        Flux<ServerSentEvent<String>> ready = Flux.just(
+                sseEvent("ready", Map.of("appId", String.valueOf(appId))));
+
+        // 代码片段：包成 {"v":"..."} 再交给 SSE。浏览器会删掉 data 字段值开头的一个空格，模型片段经常以空格开头。
+        // defer 保证订阅时才调用模型，ready 不会被前置的同步工作拖慢。
+        Flux<ServerSentEvent<String>> chunks = Flux.defer(
+                        () -> aiCodeGenFacade.generateAndSaveCodeStream(message, codeGenType, appId))
+                .map(chunk -> ServerSentEvent.<String>builder()
+                        .data(jsonMapper.writeValueAsString(new SseChunk(chunk)))
+                        .build());
+
+        // 结束事件：只有流正常完成才会发，前端据此确认生成并保存成功
+        Flux<ServerSentEvent<String>> done = Flux.just(sseEvent("done", Map.of()));
+
+        return ready.concatWith(chunks).concatWith(done)
+                .onErrorResume(e -> {
+                    log.error("流式生成代码失败, appId={}", appId, e);
+                    String msg = e instanceof BusinessException ? e.getMessage() : "代码生成失败，请稍后重试";
+                    return Flux.just(sseEvent("error", Map.of("message", msg)));
+                });
+    }
+
+    /**
+     * 构造带事件名的 SSE 事件，data 为 JSON。
+     * 必须带 data：前端生成的 SSE 客户端不会把没有 data 的事件交给 stream。
+     */
+    private ServerSentEvent<String> sseEvent(String event, Object data) {
+        return ServerSentEvent.<String>builder()
+                .event(event)
+                .data(jsonMapper.writeValueAsString(data))
+                .build();
     }
 
     private record SseChunk(String v) {

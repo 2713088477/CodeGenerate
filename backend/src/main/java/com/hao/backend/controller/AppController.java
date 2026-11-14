@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -100,7 +101,7 @@ public class AppController {
      * 创建者对话生成代码，以 SSE 流式返回。
      */
     @PostMapping(value = "/chat/gen", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> chatToGenCode(@RequestBody @Valid AppChatRequest request) {
+    public Flux<ServerSentEvent<String>> chatToGenCode(@RequestBody @Valid AppChatRequest request) {
         return appService.chatToGenCode(request, authService.getCurrentUser().getId());
     }
 }

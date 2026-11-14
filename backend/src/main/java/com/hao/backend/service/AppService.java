@@ -11,6 +11,7 @@ import com.hao.backend.model.entity.App;
 import com.hao.backend.model.vo.AdminAppVO;
 import com.hao.backend.model.vo.AppVO;
 import com.mybatisflex.core.service.IService;
+import org.springframework.http.codec.ServerSentEvent;
 import reactor.core.publisher.Flux;
 
 /**
@@ -74,9 +75,12 @@ public interface AppService extends IService<App> {
      * 创建者通过对话流式生成代码。应用不存在或不是当前用户创建的，直接拒绝。
      * @param request 应用 id 和用户消息
      * @param userId 当前用户 id，必须是应用的创建者
-     * @return SSE 片段，每段是 {"v":"模型输出"} 的 JSON 文本，避免开头空格丢失问题
+     * @return SSE 事件流：
+     *         先发一个 event: ready（data 为 {"appId":"..."}），
+     *         然后是若干没有 event 名的片段（data 为 {"v":"模型输出"}，用 JSON 包一层避免开头空格丢失），
+     *         成功结束发 event: done，生成过程中出错发 event: error（data 为 {"message":"..."}）
      */
-    Flux<String> chatToGenCode(AppChatRequest request, Long userId);
+    Flux<ServerSentEvent<String>> chatToGenCode(AppChatRequest request, Long userId);
 
     /**
      * 部署应用：把代码生成目录复制到部署目录，由 Nginx 对外提供访问。
