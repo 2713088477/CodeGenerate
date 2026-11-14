@@ -28,6 +28,11 @@ const router = createRouter({
           component: () => import('@/pages/home/index.vue'),
         },
         {
+          path: 'app/:id',
+          name: 'appDetail',
+          component: () => import('@/pages/app/index.vue'),
+        },
+        {
           path: 'user',
           name: 'userManage',
           meta: { requiresAdmin: true },

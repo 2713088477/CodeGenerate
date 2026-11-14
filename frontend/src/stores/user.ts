@@ -4,7 +4,7 @@ import { readData } from '@/utils/response'
 import { defineStore } from 'pinia'
 import { ref, watch } from 'vue'
 
-const STORAGE_KEY = 'yigou-profile'
+const STORAGE_KEY = 'yiyan-profile'
 
 function loadProfile(): UserProfileVo | null {
   const raw = sessionStorage.getItem(STORAGE_KEY)

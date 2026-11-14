@@ -1,3 +1,60 @@
+/*
+ * 艺言 设计令牌
+ * 色彩取自 logo:主体紫罗兰、环绕的青蓝到粉紫渐变、点缀的金色星星与橙粉色线条。
+ * 业务样式统一引用 --yy-* 变量,不要在页面里再硬编码颜色。
+ */
+:root {
+  --yy-violet: #7c3aed;
+  --yy-violet-soft: #8b5cf6;
+  --yy-indigo: #5b6cf5;
+  --yy-cyan: #22d3ee;
+  --yy-pink: #ec4899;
+  --yy-pink-soft: #f472b6;
+  --yy-gold: #fbbf24;
+  --yy-orange: #fb923c;
+
+  --yy-ink: #1f1a3d;
+  --yy-ink-soft: #4b4768;
+  --yy-ink-mute: #6b6788;
+
+  --yy-line: rgba(124, 58, 237, 0.14);
+  --yy-line-strong: rgba(124, 58, 237, 0.4);
+  --yy-tint: rgba(124, 58, 237, 0.08);
+  --yy-focus: #6d28d9;
+
+  --yy-gradient: linear-gradient(135deg, var(--yy-indigo), var(--yy-violet-soft) 55%, var(--yy-pink));
+  --yy-gradient-ring: linear-gradient(135deg, var(--yy-cyan), var(--yy-indigo) 45%, var(--yy-pink-soft));
+
+  --yy-radius-sm: 10px;
+  --yy-radius-md: 16px;
+  --yy-radius-lg: 22px;
+
+  /* 紫色调的双层阴影,模拟 logo 的柔和 3D 质感 */
+  --yy-shadow-sm: 0 2px 8px rgba(91, 76, 200, 0.06);
+  --yy-shadow-md: 0 10px 30px rgba(91, 76, 200, 0.12);
+  --yy-shadow-lg: 0 18px 48px rgba(91, 76, 200, 0.18);
+  --yy-inner-light: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+/* html:root 的优先级高于 Element Plus 按需注入的 :root,避免被后加载的组件样式覆盖 */
+html:root {
+  --el-color-primary: var(--yy-violet);
+  --el-color-primary-light-3: #a375f2;
+  --el-color-primary-light-5: #bd9df6;
+  --el-color-primary-light-7: #d8c4fa;
+  --el-color-primary-light-8: #e5d8fb;
+  --el-color-primary-light-9: #f2ebfd;
+  --el-color-primary-dark-2: #632ebe;
+
+  --el-text-color-primary: var(--yy-ink);
+  --el-text-color-regular: var(--yy-ink-soft);
+  --el-text-color-secondary: var(--yy-ink-mute);
+
+  --el-bg-color-page: #f7f5ff;
+  --el-border-color-lighter: #ebe6fa;
+  --el-border-color-light: #e0daf4;
+}
+
 html,
 body,
 #app {
@@ -9,4 +66,9 @@ body {
   color: var(--el-text-color-primary);
   background: var(--el-bg-color-page);
   font-family: var(--el-font-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline-color: var(--yy-focus);
 }

@@ -23,8 +23,9 @@ import AppHeader from '@/components/AppHeader.vue'
   position: sticky;
   top: 0;
   z-index: 100;
-  background: var(--el-bg-color);
-  border-bottom: 1px solid var(--el-border-color-lighter);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: saturate(160%) blur(14px);
+  border-bottom: 1px solid var(--yy-line);
 }
 
 .app-main {

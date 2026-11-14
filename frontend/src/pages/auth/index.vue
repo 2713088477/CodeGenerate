@@ -28,7 +28,7 @@ const registerForm = reactive<RegisterRequest>({
   confirmPassword: '',
 })
 
-const heading = computed(() => (activeTab.value === 'login' ? '登录艺构' : '注册艺构'))
+const heading = computed(() => (activeTab.value === 'login' ? '登录艺言' : '注册艺言'))
 
 const validateConfirmPassword: FormItemRule['validator'] = (_rule, value, callback) => {
   if (value === '') {
@@ -125,7 +125,7 @@ async function submitRegister() {
       <div class="panel-card">
         <router-link class="card-brand" to="/" aria-label="回到首页">
           <img class="card-logo" src="/logo.png" alt="" />
-          <span class="card-name">艺构</span>
+          <span class="card-name">艺言</span>
         </router-link>
         <h2 class="panel-title">{{ heading }}</h2>
         <p class="panel-lead">{{ activeTab === 'login' ? '使用账号和密码继续' : '创建一个新账号' }}</p>
@@ -235,6 +235,8 @@ async function submitRegister() {
 
 <style scoped>
 .auth-page {
+  /* 仅本页的 Element 组件使用更圆润的圆角 */
+  --el-border-radius-base: 8px;
   min-height: 100%;
   display: flex;
   align-items: safe center;
@@ -250,9 +252,13 @@ async function submitRegister() {
 
 .panel-card {
   padding: 28px 28px 24px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 18px 48px rgba(72, 42, 12, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: var(--yy-radius-lg);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  box-shadow:
+    var(--yy-inner-light),
+    0 24px 60px rgba(40, 28, 70, 0.28);
 }
 
 .card-brand {
@@ -277,10 +283,14 @@ async function submitRegister() {
 }
 
 .card-name {
-  color: var(--el-text-color-primary);
-  font-size: 18px;
-  font-weight: 700;
+  color: var(--yy-violet);
+  font-size: 20px;
+  font-weight: 800;
   letter-spacing: 0.08em;
+  background: var(--yy-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .panel-title {
@@ -306,6 +316,31 @@ async function submitRegister() {
 
 .submit {
   width: 100%;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  font-weight: 600;
+  background: var(--yy-gradient);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 6px 16px rgba(124, 58, 237, 0.3);
+  transition:
+    filter 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.submit:hover,
+.submit:focus-visible {
+  filter: brightness(1.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 8px 22px rgba(124, 58, 237, 0.42);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .submit {
+    transition: none;
+  }
 }
 
 @media (max-width: 640px) {

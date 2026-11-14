@@ -36,7 +36,7 @@ function onAccountCommand(command: string | number) {
     <div class="header-start">
       <router-link class="brand" to="/" aria-label="回到首页">
         <img src="/logo.png" alt="" />
-        <span class="brand-name">艺构</span>
+        <span class="brand-name">艺言</span>
       </router-link>
 
       <nav class="nav" aria-label="页面导航">
@@ -94,11 +94,15 @@ function onAccountCommand(command: string | number) {
 }
 
 .brand-name {
-  color: var(--el-text-color-primary);
-  font-size: 18px;
-  font-weight: 600;
+  color: var(--yy-violet);
+  font-size: 20px;
+  font-weight: 800;
   line-height: 1;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
+  background: var(--yy-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .brand img {
@@ -114,15 +118,32 @@ function onAccountCommand(command: string | number) {
   line-height: 1;
   text-decoration: none;
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: 999px;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .nav-link:hover {
   color: var(--el-color-primary);
+  background: var(--yy-tint);
+}
+
+.nav-link:focus-visible {
+  outline: 2px solid var(--yy-focus);
+  outline-offset: 2px;
 }
 
 .nav-link.router-link-exact-active {
   color: var(--el-color-primary);
+  font-weight: 600;
+  background: var(--yy-tint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-link {
+    transition: none;
+  }
 }
 
 .actions {
@@ -149,16 +170,18 @@ function onAccountCommand(command: string | number) {
 }
 
 .account:hover {
-  background: var(--el-fill-color-light);
+  background: var(--yy-tint);
 }
 
 .account:focus-visible {
-  outline: 2px solid var(--el-color-primary);
+  outline: 2px solid var(--yy-focus);
   outline-offset: 2px;
 }
 
 .account-avatar {
   flex-shrink: 0;
+  color: #fff;
+  background: var(--yy-gradient);
 }
 
 .account-name {
