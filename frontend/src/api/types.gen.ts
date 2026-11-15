@@ -90,6 +90,8 @@ export type AppChatRequest = {
     message: string;
 };
 
+export type ServerSentEventString = unknown;
+
 export type AppCreateRequest = {
     initPrompt: string;
 };
@@ -124,15 +126,6 @@ export type PageResultAdminUserVo = {
     totalPage?: number;
 };
 
-export type AppQueryRequest = {
-    pageNum?: number;
-    pageSize?: number;
-    sortField?: string;
-    asc?: boolean;
-    appName?: string;
-    deployKey?: string;
-};
-
 export type AppVo = {
     id?: string;
     appName?: string;
@@ -143,6 +136,21 @@ export type AppVo = {
     deployedTime?: string;
     createdAt?: string;
     updatedAt?: string;
+};
+
+export type BaseResponseAppVo = {
+    code?: number;
+    message?: string;
+    data?: AppVo;
+};
+
+export type AppQueryRequest = {
+    pageNum?: number;
+    pageSize?: number;
+    sortField?: string;
+    asc?: boolean;
+    appName?: string;
+    deployKey?: string;
 };
 
 export type BaseResponsePageResultAppVo = {
@@ -252,6 +260,24 @@ export type DeleteMyAppResponses = {
 };
 
 export type DeleteMyAppResponse = DeleteMyAppResponses[keyof DeleteMyAppResponses];
+
+export type GetMyAppData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/app/{id}';
+};
+
+export type GetMyAppResponses = {
+    /**
+     * OK
+     */
+    200: BaseResponseAppVo;
+};
+
+export type GetMyAppResponse = GetMyAppResponses[keyof GetMyAppResponses];
 
 export type UpdateMyAppData = {
     body: AppUpdateRequest;
@@ -400,7 +426,7 @@ export type ChatToGenCodeResponses = {
     /**
      * OK
      */
-    200: Array<string>;
+    200: Array<ServerSentEventString>;
 };
 
 export type ChatToGenCodeResponse = ChatToGenCodeResponses[keyof ChatToGenCodeResponses];

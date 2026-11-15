@@ -1,0 +1,45 @@
+/* 代码高亮配色,取自 logo:紫、粉、青、金。作用在带 yy-code 类的容器里 */
+.yy-code .hljs {
+  color: #e7e3ff;
+  background: transparent;
+}
+
+.yy-code .hljs-tag,
+.yy-code .hljs-name,
+.yy-code .hljs-selector-tag,
+.yy-code .hljs-selector-id,
+.yy-code .hljs-selector-class {
+  color: #f9a8d4;
+}
+
+.yy-code .hljs-attr,
+.yy-code .hljs-attribute,
+.yy-code .hljs-property,
+.yy-code .hljs-variable {
+  color: #67e8f9;
+}
+
+.yy-code .hljs-keyword,
+.yy-code .hljs-built_in,
+.yy-code .hljs-meta,
+.yy-code .hljs-literal {
+  color: #c4b5fd;
+}
+
+.yy-code .hljs-string,
+.yy-code .hljs-template-variable {
+  color: #fcd34d;
+}
+
+.yy-code .hljs-number,
+.yy-code .hljs-symbol,
+.yy-code .hljs-title,
+.yy-code .hljs-function {
+  color: #fdba74;
+}
+
+.yy-code .hljs-comment,
+.yy-code .hljs-quote {
+  color: #8b86a8;
+  font-style: italic;
+}

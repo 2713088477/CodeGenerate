@@ -19,6 +19,12 @@ const router = createRouter({
       component: () => import('@/pages/auth/index.vue'),
     },
     {
+      // 应用工作台自带顶栏,占满整个窗口,不放在 BasicLayout 里
+      path: '/app/:id',
+      name: 'appDetail',
+      component: () => import('@/pages/app/index.vue'),
+    },
+    {
       path: '/',
       component: BasicLayout,
       children: [
@@ -26,11 +32,6 @@ const router = createRouter({
           path: '',
           name: 'home',
           component: () => import('@/pages/home/index.vue'),
-        },
-        {
-          path: 'app/:id',
-          name: 'appDetail',
-          component: () => import('@/pages/app/index.vue'),
         },
         {
           path: 'user',

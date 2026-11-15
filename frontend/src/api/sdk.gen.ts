@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, ServerSentEventsResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddAppData, AddAppResponses, AdminDeleteAppData, AdminDeleteAppResponses, AdminUpdateAppData, AdminUpdateAppResponses, ChatToGenCodeData, ChatToGenCodeResponse, ChatToGenCodeResponses, CreateData, CreateResponses, DeleteData, DeleteMyAppData, DeleteMyAppResponses, DeleteResponses, DeployAppData, DeployAppResponses, LoginData, LoginResponses, LogoutData, LogoutResponses, PageAllAppsData, PageAllAppsResponses, PageData, PageMyAppsData, PageMyAppsResponses, PageResponses, PingData, PingResponses, RegisterData, RegisterResponses, UpdateData, UpdateMyAppData, UpdateMyAppResponses, UpdateResponses } from './types.gen';
+import type { AddAppData, AddAppResponses, AdminDeleteAppData, AdminDeleteAppResponses, AdminUpdateAppData, AdminUpdateAppResponses, ChatToGenCodeData, ChatToGenCodeResponse, ChatToGenCodeResponses, CreateData, CreateResponses, DeleteData, DeleteMyAppData, DeleteMyAppResponses, DeleteResponses, DeployAppData, DeployAppResponses, GetMyAppData, GetMyAppResponses, LoginData, LoginResponses, LogoutData, LogoutResponses, PageAllAppsData, PageAllAppsResponses, PageData, PageMyAppsData, PageMyAppsResponses, PageResponses, PingData, PingResponses, RegisterData, RegisterResponses, UpdateData, UpdateMyAppData, UpdateMyAppResponses, UpdateResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -30,6 +30,8 @@ export const update = <ThrowOnError extends boolean = false>(options: Options<Up
 });
 
 export const deleteMyApp = <ThrowOnError extends boolean = false>(options: Options<DeleteMyAppData, ThrowOnError>): RequestResult<DeleteMyAppResponses, unknown, ThrowOnError> => (options.client ?? client).delete<DeleteMyAppResponses, unknown, ThrowOnError>({ url: '/app/{id}', ...options });
+
+export const getMyApp = <ThrowOnError extends boolean = false>(options: Options<GetMyAppData, ThrowOnError>): RequestResult<GetMyAppResponses, unknown, ThrowOnError> => (options.client ?? client).get<GetMyAppResponses, unknown, ThrowOnError>({ url: '/app/{id}', ...options });
 
 export const updateMyApp = <ThrowOnError extends boolean = false>(options: Options<UpdateMyAppData, ThrowOnError>): RequestResult<UpdateMyAppResponses, unknown, ThrowOnError> => (options.client ?? client).put<UpdateMyAppResponses, unknown, ThrowOnError>({
     url: '/app/{id}',

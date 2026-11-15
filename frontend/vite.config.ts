@@ -20,7 +20,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8123',
+        // 默认代理到本地后端,需要连别的后端实例时用 VITE_PROXY_TARGET 覆盖
+        target: process.env.VITE_PROXY_TARGET ?? 'http://localhost:8123',
         changeOrigin: true,
       },
     },
