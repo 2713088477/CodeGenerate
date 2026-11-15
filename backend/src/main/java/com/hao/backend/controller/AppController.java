@@ -48,6 +48,11 @@ public class AppController {
         return BaseResponse.success(appId);
     }
 
+    @GetMapping("/{id}")
+    public BaseResponse<AppVO> getMyApp(@Parameter(schema = @Schema(type = "string")) @PathVariable Long id) {
+        return BaseResponse.success(appService.getMyApp(id, authService.getCurrentUser().getId()));
+    }
+
     @GetMapping("/my/page")
     public BaseResponse<PageResult<AppVO>> pageMyApps(@Valid AppQueryRequest query) {
         return BaseResponse.success(appService.pageMyApps(query, authService.getCurrentUser().getId()));

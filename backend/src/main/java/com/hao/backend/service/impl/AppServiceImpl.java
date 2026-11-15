@@ -100,6 +100,14 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
     }
 
     @Override
+    public AppVO getMyApp(Long id, Long userId) {
+        ThrowUtil.throwIf(userId == null, ResponseCode.UNAUTHORIZED);
+        App app = getExistingApp(id);
+        ThrowUtil.throwIf(!app.getUserId().equals(userId), ResponseCode.FORBIDDEN, "无权访问该应用");
+        return AppVO.from(app);
+    }
+
+    @Override
     public void updateMyApp(Long id, AppUpdateRequest request, Long userId) {
         App app = getExistingApp(id);
         // 只能改自己的应用

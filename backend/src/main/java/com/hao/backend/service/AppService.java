@@ -30,6 +30,13 @@ public interface AppService extends IService<App> {
     Long createApp(AppCreateRequest request, Long userId);
 
     /**
+     * 查询自己的应用详情。应用不存在返回 404，不是创建者返回 403。
+     * @param id 应用 id
+     * @param userId 当前用户 id，必须是应用的创建者
+     */
+    AppVO getMyApp(Long id, Long userId);
+
+    /**
      * 用户修改自己的应用（只能改名称）
      * @param id 应用 id
      * @param request 修改请求
