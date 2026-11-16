@@ -1,3 +1,46 @@
+<template>
+  <div class="prompt-box">
+    <form class="panel" @submit.prevent="onSubmit">
+      <el-input
+        v-model="prompt"
+        class="prompt-input"
+        type="textarea"
+        :autosize="{ minRows: 3, maxRows: 7 }"
+        :maxlength="MAX_LENGTH"
+        resize="none"
+        placeholder="描述你想要的应用,例如:做一个带搜索功能的图书收藏夹"
+        aria-label="应用需求描述"
+        :disabled="loading"
+        @keydown.ctrl.enter.prevent="onSubmit"
+        @keydown.meta.enter.prevent="onSubmit"
+      />
+      <div class="panel-footer">
+        <span class="counter">{{ prompt.length }} / {{ MAX_LENGTH }}</span>
+        <span class="shortcut">Ctrl + Enter 快速创建</span>
+        <button class="submit" type="submit" :disabled="!canSubmit || loading" :aria-busy="loading">
+          <span v-if="loading" class="spinner" aria-hidden="true" />
+          <el-icon v-else aria-hidden="true"><Promotion /></el-icon>
+          {{ loading ? '创建中…' : '创建应用' }}
+        </button>
+      </div>
+    </form>
+
+    <div class="examples" role="group" aria-label="示例提示词">
+      <span class="examples-label">试试:</span>
+      <button
+        v-for="item in EXAMPLES"
+        :key="item"
+        class="chip"
+        type="button"
+        :disabled="loading"
+        @click="fillExample(item)"
+      >
+        {{ item }}
+      </button>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { Promotion } from '@element-plus/icons-vue'
 import { ElIcon, ElInput } from 'element-plus'
@@ -41,49 +84,6 @@ function clear() {
 
 defineExpose({ clear })
 </script>
-
-<template>
-  <div class="prompt-box">
-    <form class="panel" @submit.prevent="onSubmit">
-      <el-input
-        v-model="prompt"
-        class="prompt-input"
-        type="textarea"
-        :autosize="{ minRows: 3, maxRows: 7 }"
-        :maxlength="MAX_LENGTH"
-        resize="none"
-        placeholder="描述你想要的应用,例如:做一个带搜索功能的图书收藏夹"
-        aria-label="应用需求描述"
-        :disabled="loading"
-        @keydown.ctrl.enter.prevent="onSubmit"
-        @keydown.meta.enter.prevent="onSubmit"
-      />
-      <div class="panel-footer">
-        <span class="counter">{{ prompt.length }} / {{ MAX_LENGTH }}</span>
-        <span class="shortcut">Ctrl + Enter 快速创建</span>
-        <button class="submit" type="submit" :disabled="!canSubmit || loading" :aria-busy="loading">
-          <span v-if="loading" class="spinner" aria-hidden="true" />
-          <el-icon v-else aria-hidden="true"><Promotion /></el-icon>
-          {{ loading ? '创建中…' : '创建应用' }}
-        </button>
-      </div>
-    </form>
-
-    <div class="examples" role="group" aria-label="示例提示词">
-      <span class="examples-label">试试:</span>
-      <button
-        v-for="item in EXAMPLES"
-        :key="item"
-        class="chip"
-        type="button"
-        :disabled="loading"
-        @click="fillExample(item)"
-      >
-        {{ item }}
-      </button>
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .prompt-box {

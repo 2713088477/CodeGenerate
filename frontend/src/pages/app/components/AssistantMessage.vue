@@ -1,41 +1,3 @@
-<script setup lang="ts">
-import { CircleCheckFilled, CircleCloseFilled, RefreshRight, VideoPause } from '@element-plus/icons-vue'
-import { ElButton, ElIcon } from 'element-plus'
-import { computed } from 'vue'
-import { renderMarkdown } from '@/utils/markdown'
-import type { ChatMessage } from '../composables/useAppChat'
-import CodeBlock from './CodeBlock.vue'
-
-const props = defineProps<{
-  message: ChatMessage
-  /** 只有最后一条失败的回复才显示重试 */
-  canRetry: boolean
-}>()
-
-defineEmits<{
-  retry: []
-}>()
-
-const working = computed(() => props.message.status === 'connecting' || props.message.status === 'streaming')
-
-const statusText = computed(() => {
-  const { status, files } = props.message
-  if (status === 'connecting') {
-    return '正在连接…'
-  }
-  if (status === 'streaming') {
-    const writing = files.find((file) => !file.done)
-    if (writing) {
-      return `正在编写 ${writing.name}`
-    }
-    return files.length > 0 ? '正在整理说明…' : '正在构思页面…'
-  }
-  return ''
-})
-
-const descriptionHtml = computed(() => (props.message.description ? renderMarkdown(props.message.description) : ''))
-</script>
-
 <template>
   <div class="assistant">
     <img class="avatar" src="/logo.png" alt="" />
@@ -75,6 +37,44 @@ const descriptionHtml = computed(() => (props.message.description ? renderMarkdo
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { CircleCheckFilled, CircleCloseFilled, RefreshRight, VideoPause } from '@element-plus/icons-vue'
+import { ElButton, ElIcon } from 'element-plus'
+import { computed } from 'vue'
+import { renderMarkdown } from '@/utils/markdown'
+import type { ChatMessage } from '../composables/useAppChat'
+import CodeBlock from './CodeBlock.vue'
+
+const props = defineProps<{
+  message: ChatMessage
+  /** 只有最后一条失败的回复才显示重试 */
+  canRetry: boolean
+}>()
+
+defineEmits<{
+  retry: []
+}>()
+
+const working = computed(() => props.message.status === 'connecting' || props.message.status === 'streaming')
+
+const statusText = computed(() => {
+  const { status, files } = props.message
+  if (status === 'connecting') {
+    return '正在连接…'
+  }
+  if (status === 'streaming') {
+    const writing = files.find((file) => !file.done)
+    if (writing) {
+      return `正在编写 ${writing.name}`
+    }
+    return files.length > 0 ? '正在整理说明…' : '正在构思页面…'
+  }
+  return ''
+})
+
+const descriptionHtml = computed(() => (props.message.description ? renderMarkdown(props.message.description) : ''))
+</script>
 
 <style scoped>
 .assistant {

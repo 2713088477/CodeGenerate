@@ -1,3 +1,70 @@
+<template>
+  <section class="home-page">
+    <div class="home-inner">
+      <header class="hero">
+        <h1 class="hero-title">
+          一句话,生成你的<span class="hero-accent">应用</span>
+        </h1>
+        <p class="hero-sub">描述你的想法,AI 帮你写好页面代码,随时预览和部署。</p>
+      </header>
+
+      <PromptBox ref="promptBox" :loading="creating" @submit="onCreate" />
+
+      <section ref="listSection" class="apps" aria-labelledby="apps-heading">
+        <div class="apps-header">
+          <h2 id="apps-heading" class="apps-title">我的应用</h2>
+          <span v-if="profile && pager.total > 0" class="apps-count">共 {{ pager.total }} 个</span>
+        </div>
+
+        <div v-if="!profile" class="state">
+          <span class="state-icon" aria-hidden="true"><el-icon :size="26"><Lock /></el-icon></span>
+          <p class="state-text">登录后即可创建并查看你的应用</p>
+          <el-button type="primary" @click="goLogin">去登录</el-button>
+        </div>
+
+        <ul v-else-if="showSkeleton" class="grid" aria-busy="true" aria-label="加载中">
+          <li v-for="n in 8" :key="n" class="skeleton-card">
+            <el-skeleton animated>
+              <template #template>
+                <el-skeleton-item variant="image" class="skeleton-cover" />
+                <div class="skeleton-info">
+                  <el-skeleton-item variant="h3" style="width: 60%" />
+                  <el-skeleton-item variant="text" style="width: 40%" />
+                </div>
+              </template>
+            </el-skeleton>
+          </li>
+        </ul>
+
+        <div v-else-if="showEmpty" class="state">
+          <span class="state-icon" aria-hidden="true"><el-icon :size="26"><FolderOpened /></el-icon></span>
+          <p class="state-text">还没有应用,从上面的输入框开始创建吧</p>
+        </div>
+
+        <template v-else>
+          <ul class="grid" :class="{ 'is-loading': loading }">
+            <li v-for="item in apps" :key="item.id">
+              <AppCard :app="item" @open="openApp" />
+            </li>
+          </ul>
+
+          <div v-if="pager.total > pager.pageSize" class="pager">
+            <el-pagination
+              :current-page="pager.pageNum"
+              :page-size="pager.pageSize"
+              :total="pager.total"
+              layout="prev, pager, next"
+              background
+              hide-on-single-page
+              @current-change="onPageChange"
+            />
+          </div>
+        </template>
+      </section>
+    </div>
+  </section>
+</template>
+
 <script setup lang="ts">
 import { FolderOpened, Lock } from '@element-plus/icons-vue'
 import { ElButton, ElIcon, ElMessage, ElPagination, ElSkeleton, ElSkeletonItem } from 'element-plus'
@@ -72,73 +139,6 @@ onMounted(() => {
   }
 })
 </script>
-
-<template>
-  <section class="home-page">
-    <div class="home-inner">
-      <header class="hero">
-        <h1 class="hero-title">
-          一句话,生成你的<span class="hero-accent">应用</span>
-        </h1>
-        <p class="hero-sub">描述你的想法,AI 帮你写好页面代码,随时预览和部署。</p>
-      </header>
-
-      <PromptBox ref="promptBox" :loading="creating" @submit="onCreate" />
-
-      <section ref="listSection" class="apps" aria-labelledby="apps-heading">
-        <div class="apps-header">
-          <h2 id="apps-heading" class="apps-title">我的应用</h2>
-          <span v-if="profile && pager.total > 0" class="apps-count">共 {{ pager.total }} 个</span>
-        </div>
-
-        <div v-if="!profile" class="state">
-          <span class="state-icon" aria-hidden="true"><el-icon :size="26"><Lock /></el-icon></span>
-          <p class="state-text">登录后即可创建并查看你的应用</p>
-          <el-button type="primary" @click="goLogin">去登录</el-button>
-        </div>
-
-        <ul v-else-if="showSkeleton" class="grid" aria-busy="true" aria-label="加载中">
-          <li v-for="n in 8" :key="n" class="skeleton-card">
-            <el-skeleton animated>
-              <template #template>
-                <el-skeleton-item variant="image" class="skeleton-cover" />
-                <div class="skeleton-info">
-                  <el-skeleton-item variant="h3" style="width: 60%" />
-                  <el-skeleton-item variant="text" style="width: 40%" />
-                </div>
-              </template>
-            </el-skeleton>
-          </li>
-        </ul>
-
-        <div v-else-if="showEmpty" class="state">
-          <span class="state-icon" aria-hidden="true"><el-icon :size="26"><FolderOpened /></el-icon></span>
-          <p class="state-text">还没有应用,从上面的输入框开始创建吧</p>
-        </div>
-
-        <template v-else>
-          <ul class="grid" :class="{ 'is-loading': loading }">
-            <li v-for="item in apps" :key="item.id">
-              <AppCard :app="item" @open="openApp" />
-            </li>
-          </ul>
-
-          <div v-if="pager.total > pager.pageSize" class="pager">
-            <el-pagination
-              :current-page="pager.pageNum"
-              :page-size="pager.pageSize"
-              :total="pager.total"
-              layout="prev, pager, next"
-              background
-              hide-on-single-page
-              @current-change="onPageChange"
-            />
-          </div>
-        </template>
-      </section>
-    </div>
-  </section>
-</template>
 
 <style scoped>
 .home-page {

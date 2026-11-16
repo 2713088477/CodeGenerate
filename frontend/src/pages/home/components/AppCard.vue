@@ -1,3 +1,31 @@
+<template>
+  <article class="app-card">
+    <button class="card-button" type="button" :aria-label="`打开应用 ${name}`" @click="onOpen">
+      <div class="cover">
+        <img
+          v-if="showImage"
+          class="cover-img"
+          :src="app.cover"
+          alt=""
+          loading="lazy"
+          @error="coverFailed = true"
+        />
+        <div v-else class="cover-placeholder" :style="placeholderStyle" aria-hidden="true">
+          <span class="cover-glow" />
+          <span class="cover-initial">{{ initial }}</span>
+        </div>
+      </div>
+      <div class="info">
+        <h3 class="name" :title="name">{{ name }}</h3>
+        <p class="time">
+          <el-icon aria-hidden="true"><Clock /></el-icon>
+          <time :datetime="app.createdAt">{{ createdAt }}</time>
+        </p>
+      </div>
+    </button>
+  </article>
+</template>
+
 <script setup lang="ts">
 import { Clock } from '@element-plus/icons-vue'
 import { ElIcon } from 'element-plus'
@@ -54,34 +82,6 @@ function onOpen() {
   }
 }
 </script>
-
-<template>
-  <article class="app-card">
-    <button class="card-button" type="button" :aria-label="`打开应用 ${name}`" @click="onOpen">
-      <div class="cover">
-        <img
-          v-if="showImage"
-          class="cover-img"
-          :src="app.cover"
-          alt=""
-          loading="lazy"
-          @error="coverFailed = true"
-        />
-        <div v-else class="cover-placeholder" :style="placeholderStyle" aria-hidden="true">
-          <span class="cover-glow" />
-          <span class="cover-initial">{{ initial }}</span>
-        </div>
-      </div>
-      <div class="info">
-        <h3 class="name" :title="name">{{ name }}</h3>
-        <p class="time">
-          <el-icon aria-hidden="true"><Clock /></el-icon>
-          <time :datetime="app.createdAt">{{ createdAt }}</time>
-        </p>
-      </div>
-    </button>
-  </article>
-</template>
 
 <style scoped>
 .app-card {

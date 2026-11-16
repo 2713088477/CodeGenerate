@@ -1,3 +1,117 @@
+<template>
+  <div class="auth-page">
+    <section class="panel">
+      <div class="panel-card">
+        <router-link class="card-brand" to="/" aria-label="回到首页">
+          <img class="card-logo" src="/logo.png" alt="" />
+          <span class="card-name">艺言</span>
+        </router-link>
+        <h2 class="panel-title">{{ heading }}</h2>
+        <p class="panel-lead">{{ activeTab === 'login' ? '使用账号和密码继续' : '创建一个新账号' }}</p>
+
+        <el-tabs v-model="activeTab" class="auth-tabs" stretch>
+          <el-tab-pane label="登录" name="login">
+            <el-form
+              ref="loginFormRef"
+              class="auth-form"
+              :model="loginForm"
+              :rules="loginRules"
+              label-width="0"
+              @submit.prevent="submitLogin"
+            >
+              <el-form-item prop="userAccount">
+                <el-input
+                  v-model="loginForm.userAccount"
+                  size="large"
+                  placeholder="请输入账号"
+                  aria-label="账号"
+                  autocomplete="username"
+                  maxlength="32"
+                  clearable
+                  :prefix-icon="User"
+                />
+              </el-form-item>
+              <el-form-item prop="userPassword">
+                <el-input
+                  v-model="loginForm.userPassword"
+                  size="large"
+                  type="password"
+                  placeholder="请输入密码"
+                  aria-label="密码"
+                  autocomplete="current-password"
+                  maxlength="64"
+                  show-password
+                  :prefix-icon="Lock"
+                />
+              </el-form-item>
+              <el-form-item class="submit-item">
+                <el-button class="submit" type="primary" size="large" native-type="submit" :loading="submitting">
+                  登录
+                </el-button>
+              </el-form-item>
+            </el-form>
+          </el-tab-pane>
+
+          <el-tab-pane label="注册" name="register">
+            <el-form
+              ref="registerFormRef"
+              class="auth-form"
+              :model="registerForm"
+              :rules="registerRules"
+              label-width="0"
+              @submit.prevent="submitRegister"
+            >
+              <el-form-item prop="userAccount">
+                <el-input
+                  v-model="registerForm.userAccount"
+                  size="large"
+                  placeholder="请输入账号"
+                  aria-label="账号"
+                  autocomplete="username"
+                  maxlength="32"
+                  clearable
+                  :prefix-icon="User"
+                />
+              </el-form-item>
+              <el-form-item prop="userPassword">
+                <el-input
+                  v-model="registerForm.userPassword"
+                  size="large"
+                  type="password"
+                  placeholder="请输入密码，6 到 64 位"
+                  aria-label="密码"
+                  autocomplete="new-password"
+                  maxlength="64"
+                  show-password
+                  :prefix-icon="Lock"
+                />
+              </el-form-item>
+              <el-form-item prop="confirmPassword">
+                <el-input
+                  v-model="registerForm.confirmPassword"
+                  size="large"
+                  type="password"
+                  placeholder="请再次输入密码"
+                  aria-label="确认密码"
+                  autocomplete="new-password"
+                  maxlength="64"
+                  show-password
+                  :prefix-icon="Lock"
+                />
+              </el-form-item>
+              <el-form-item class="submit-item">
+                <el-button class="submit" type="primary" size="large" native-type="submit" :loading="submitting">
+                  注册
+                </el-button>
+              </el-form-item>
+            </el-form>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
+    </section>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { Lock, User } from '@element-plus/icons-vue'
 import type { FormInstance, FormItemRule, FormRules } from 'element-plus'
@@ -118,120 +232,6 @@ async function submitRegister() {
   }
 }
 </script>
-
-<template>
-  <div class="auth-page">
-    <section class="panel">
-      <div class="panel-card">
-        <router-link class="card-brand" to="/" aria-label="回到首页">
-          <img class="card-logo" src="/logo.png" alt="" />
-          <span class="card-name">艺言</span>
-        </router-link>
-        <h2 class="panel-title">{{ heading }}</h2>
-        <p class="panel-lead">{{ activeTab === 'login' ? '使用账号和密码继续' : '创建一个新账号' }}</p>
-
-        <el-tabs v-model="activeTab" class="auth-tabs" stretch>
-          <el-tab-pane label="登录" name="login">
-            <el-form
-              ref="loginFormRef"
-              class="auth-form"
-              :model="loginForm"
-              :rules="loginRules"
-              label-width="0"
-              @submit.prevent="submitLogin"
-            >
-              <el-form-item prop="userAccount">
-                <el-input
-                  v-model="loginForm.userAccount"
-                  size="large"
-                  placeholder="请输入账号"
-                  aria-label="账号"
-                  autocomplete="username"
-                  maxlength="32"
-                  clearable
-                  :prefix-icon="User"
-                />
-              </el-form-item>
-              <el-form-item prop="userPassword">
-                <el-input
-                  v-model="loginForm.userPassword"
-                  size="large"
-                  type="password"
-                  placeholder="请输入密码"
-                  aria-label="密码"
-                  autocomplete="current-password"
-                  maxlength="64"
-                  show-password
-                  :prefix-icon="Lock"
-                />
-              </el-form-item>
-              <el-form-item class="submit-item">
-                <el-button class="submit" type="primary" size="large" native-type="submit" :loading="submitting">
-                  登录
-                </el-button>
-              </el-form-item>
-            </el-form>
-          </el-tab-pane>
-
-          <el-tab-pane label="注册" name="register">
-            <el-form
-              ref="registerFormRef"
-              class="auth-form"
-              :model="registerForm"
-              :rules="registerRules"
-              label-width="0"
-              @submit.prevent="submitRegister"
-            >
-              <el-form-item prop="userAccount">
-                <el-input
-                  v-model="registerForm.userAccount"
-                  size="large"
-                  placeholder="请输入账号"
-                  aria-label="账号"
-                  autocomplete="username"
-                  maxlength="32"
-                  clearable
-                  :prefix-icon="User"
-                />
-              </el-form-item>
-              <el-form-item prop="userPassword">
-                <el-input
-                  v-model="registerForm.userPassword"
-                  size="large"
-                  type="password"
-                  placeholder="请输入密码，6 到 64 位"
-                  aria-label="密码"
-                  autocomplete="new-password"
-                  maxlength="64"
-                  show-password
-                  :prefix-icon="Lock"
-                />
-              </el-form-item>
-              <el-form-item prop="confirmPassword">
-                <el-input
-                  v-model="registerForm.confirmPassword"
-                  size="large"
-                  type="password"
-                  placeholder="请再次输入密码"
-                  aria-label="确认密码"
-                  autocomplete="new-password"
-                  maxlength="64"
-                  show-password
-                  :prefix-icon="Lock"
-                />
-              </el-form-item>
-              <el-form-item class="submit-item">
-                <el-button class="submit" type="primary" size="large" native-type="submit" :loading="submitting">
-                  注册
-                </el-button>
-              </el-form-item>
-            </el-form>
-          </el-tab-pane>
-        </el-tabs>
-      </div>
-    </section>
-  </div>
-</template>
 
 <style scoped>
 .auth-page {

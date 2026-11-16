@@ -1,82 +1,3 @@
-<script setup lang="ts">
-import { Iphone, Monitor, Refresh, TopRight } from '@element-plus/icons-vue'
-import { ElIcon, ElTooltip } from 'element-plus'
-import { computed, nextTick, shallowRef, useTemplateRef, watch } from 'vue'
-import { useHighlightedCode } from '../composables/useHighlightedCode'
-import type { GenFile } from '../composables/useAppChat'
-
-type Mode = 'preview' | 'code'
-type Device = 'desktop' | 'mobile'
-
-const props = defineProps<{
-  appId: string
-  /** 后端是否已经保存过这个应用的代码 */
-  hasPreview: boolean
-  /** 每次生成完成加 1,用来让 iframe 重新加载 */
-  version: number
-  generating: boolean
-  /** 最近一次生成的文件,用于"代码"视图 */
-  files: GenFile[]
-}>()
-
-const mode = shallowRef<Mode>('preview')
-const device = shallowRef<Device>('desktop')
-const reloadKey = shallowRef(0)
-const frameLoading = shallowRef(true)
-const picked = shallowRef<string | null>(null)
-const codeBody = useTemplateRef<HTMLElement>('codeBody')
-
-const previewUrl = computed(() => `/api/app/preview/${props.appId}/`)
-const frameSrc = computed(() => `${previewUrl.value}?t=${props.version}-${reloadKey.value}`)
-const hasFiles = computed(() => props.files.length > 0)
-
-// 选中的文件:用户点过就用用户选的,否则跟随正在写的(最后一个)文件
-const current = computed(() => {
-  const chosen = picked.value ? props.files.find((file) => file.key === picked.value) : undefined
-  return chosen ?? props.files[props.files.length - 1]
-})
-
-const { html } = useHighlightedCode(
-  () => current.value,
-  () => {
-    if (props.generating && picked.value === null) {
-      void nextTick(() => {
-        if (codeBody.value) {
-          codeBody.value.scrollTop = codeBody.value.scrollHeight
-        }
-      })
-    }
-  },
-)
-
-// 开始生成就切到代码视图看进度,生成完成(version 变化)后切回预览
-watch(
-  () => props.generating,
-  (value) => {
-    if (value) {
-      picked.value = null
-      mode.value = 'code'
-    }
-  },
-)
-watch(
-  () => props.version,
-  () => {
-    frameLoading.value = true
-    mode.value = 'preview'
-  },
-)
-
-function refresh() {
-  frameLoading.value = true
-  reloadKey.value++
-}
-
-function openInNewTab() {
-  window.open(frameSrc.value, '_blank', 'noopener')
-}
-</script>
-
 <template>
   <section class="preview-panel" aria-label="应用预览">
     <div class="toolbar">
@@ -194,6 +115,85 @@ function openInNewTab() {
     </div>
   </section>
 </template>
+
+<script setup lang="ts">
+import { Iphone, Monitor, Refresh, TopRight } from '@element-plus/icons-vue'
+import { ElIcon, ElTooltip } from 'element-plus'
+import { computed, nextTick, shallowRef, useTemplateRef, watch } from 'vue'
+import { useHighlightedCode } from '../composables/useHighlightedCode'
+import type { GenFile } from '../composables/useAppChat'
+
+type Mode = 'preview' | 'code'
+type Device = 'desktop' | 'mobile'
+
+const props = defineProps<{
+  appId: string
+  /** 后端是否已经保存过这个应用的代码 */
+  hasPreview: boolean
+  /** 每次生成完成加 1,用来让 iframe 重新加载 */
+  version: number
+  generating: boolean
+  /** 最近一次生成的文件,用于"代码"视图 */
+  files: GenFile[]
+}>()
+
+const mode = shallowRef<Mode>('preview')
+const device = shallowRef<Device>('desktop')
+const reloadKey = shallowRef(0)
+const frameLoading = shallowRef(true)
+const picked = shallowRef<string | null>(null)
+const codeBody = useTemplateRef<HTMLElement>('codeBody')
+
+const previewUrl = computed(() => `/api/app/preview/${props.appId}/`)
+const frameSrc = computed(() => `${previewUrl.value}?t=${props.version}-${reloadKey.value}`)
+const hasFiles = computed(() => props.files.length > 0)
+
+// 选中的文件:用户点过就用用户选的,否则跟随正在写的(最后一个)文件
+const current = computed(() => {
+  const chosen = picked.value ? props.files.find((file) => file.key === picked.value) : undefined
+  return chosen ?? props.files[props.files.length - 1]
+})
+
+const { html } = useHighlightedCode(
+  () => current.value,
+  () => {
+    if (props.generating && picked.value === null) {
+      void nextTick(() => {
+        if (codeBody.value) {
+          codeBody.value.scrollTop = codeBody.value.scrollHeight
+        }
+      })
+    }
+  },
+)
+
+// 开始生成就切到代码视图看进度,生成完成(version 变化)后切回预览
+watch(
+  () => props.generating,
+  (value) => {
+    if (value) {
+      picked.value = null
+      mode.value = 'code'
+    }
+  },
+)
+watch(
+  () => props.version,
+  () => {
+    frameLoading.value = true
+    mode.value = 'preview'
+  },
+)
+
+function refresh() {
+  frameLoading.value = true
+  reloadKey.value++
+}
+
+function openInNewTab() {
+  window.open(frameSrc.value, '_blank', 'noopener')
+}
+</script>
 
 <style scoped>
 .preview-panel {

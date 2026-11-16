@@ -1,3 +1,30 @@
+<template>
+  <div class="code-block" :class="{ 'is-streaming': streaming }">
+    <div class="head">
+      <button
+        class="toggle"
+        type="button"
+        :aria-expanded="open"
+        :aria-label="`${open ? '折叠' : '展开'} ${file.name}`"
+        @click="toggle"
+      >
+        <el-icon class="chevron" :class="{ 'is-open': open }" aria-hidden="true"><ArrowDown /></el-icon>
+        <el-icon class="file-icon" aria-hidden="true"><Document /></el-icon>
+        <span class="file-name">{{ file.name }}</span>
+        <span class="meta">{{ lineCount }} 行</span>
+        <span v-if="streaming" class="writing"><span class="dot" aria-hidden="true" />编写中</span>
+        <el-icon v-else class="ok" aria-label="已完成"><CircleCheckFilled /></el-icon>
+      </button>
+      <button class="copy" type="button" :aria-label="`复制 ${file.name}`" @click="copy">
+        <el-icon aria-hidden="true"><CopyDocument /></el-icon>
+      </button>
+    </div>
+    <div v-show="open" ref="body" class="body" @scroll.passive="onScroll">
+      <pre class="yy-code"><code class="hljs" v-html="html" /><span v-if="streaming" class="caret" aria-hidden="true" /></pre>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { ArrowDown, CircleCheckFilled, CopyDocument, Document } from '@element-plus/icons-vue'
 import { ElIcon, ElMessage } from 'element-plus'
@@ -62,33 +89,6 @@ async function copy() {
   }
 }
 </script>
-
-<template>
-  <div class="code-block" :class="{ 'is-streaming': streaming }">
-    <div class="head">
-      <button
-        class="toggle"
-        type="button"
-        :aria-expanded="open"
-        :aria-label="`${open ? '折叠' : '展开'} ${file.name}`"
-        @click="toggle"
-      >
-        <el-icon class="chevron" :class="{ 'is-open': open }" aria-hidden="true"><ArrowDown /></el-icon>
-        <el-icon class="file-icon" aria-hidden="true"><Document /></el-icon>
-        <span class="file-name">{{ file.name }}</span>
-        <span class="meta">{{ lineCount }} 行</span>
-        <span v-if="streaming" class="writing"><span class="dot" aria-hidden="true" />编写中</span>
-        <el-icon v-else class="ok" aria-label="已完成"><CircleCheckFilled /></el-icon>
-      </button>
-      <button class="copy" type="button" :aria-label="`复制 ${file.name}`" @click="copy">
-        <el-icon aria-hidden="true"><CopyDocument /></el-icon>
-      </button>
-    </div>
-    <div v-show="open" ref="body" class="body" @scroll.passive="onScroll">
-      <pre class="yy-code"><code class="hljs" v-html="html" /><span v-if="streaming" class="caret" aria-hidden="true" /></pre>
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .code-block {

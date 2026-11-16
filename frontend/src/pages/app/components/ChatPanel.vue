@@ -1,3 +1,34 @@
+<template>
+  <section class="chat-panel" aria-label="对话">
+    <div ref="scroller" class="messages" @scroll.passive="onScroll">
+      <div class="messages-inner">
+        <template v-for="message in messages" :key="message.id">
+          <div v-if="message.role === 'user'" class="user-row">
+            <p class="user-bubble">{{ message.content }}</p>
+          </div>
+          <AssistantMessage v-else :message="message" :can-retry="isLastFailed(message)" @retry="emit('retry')" />
+        </template>
+      </div>
+    </div>
+
+    <button
+      v-show="!stickToBottom && generating"
+      class="jump"
+      type="button"
+      aria-label="回到最新内容"
+      @click="((stickToBottom = true), scrollToBottom(true))"
+    >
+      <el-icon aria-hidden="true"><ArrowDown /></el-icon>
+      回到最新
+    </button>
+
+    <div class="composer">
+      <p class="notice">继续对话会根据你的新描述重新生成整个页面,并覆盖当前版本。</p>
+      <ChatInput :generating="generating" @submit="emit('send', $event)" @stop="emit('stop')" />
+    </div>
+  </section>
+</template>
+
 <script setup lang="ts">
 import { ArrowDown } from '@element-plus/icons-vue'
 import { ElIcon } from 'element-plus'
@@ -63,37 +94,6 @@ function isLastFailed(message: ChatMessage) {
   return message.id === lastId.value && message.status === 'error'
 }
 </script>
-
-<template>
-  <section class="chat-panel" aria-label="对话">
-    <div ref="scroller" class="messages" @scroll.passive="onScroll">
-      <div class="messages-inner">
-        <template v-for="message in messages" :key="message.id">
-          <div v-if="message.role === 'user'" class="user-row">
-            <p class="user-bubble">{{ message.content }}</p>
-          </div>
-          <AssistantMessage v-else :message="message" :can-retry="isLastFailed(message)" @retry="emit('retry')" />
-        </template>
-      </div>
-    </div>
-
-    <button
-      v-show="!stickToBottom && generating"
-      class="jump"
-      type="button"
-      aria-label="回到最新内容"
-      @click="((stickToBottom = true), scrollToBottom(true))"
-    >
-      <el-icon aria-hidden="true"><ArrowDown /></el-icon>
-      回到最新
-    </button>
-
-    <div class="composer">
-      <p class="notice">继续对话会根据你的新描述重新生成整个页面,并覆盖当前版本。</p>
-      <ChatInput :generating="generating" @submit="emit('send', $event)" @stop="emit('stop')" />
-    </div>
-  </section>
-</template>
 
 <style scoped>
 .chat-panel {

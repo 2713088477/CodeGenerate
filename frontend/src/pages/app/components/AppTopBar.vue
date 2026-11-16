@@ -1,3 +1,31 @@
+<template>
+  <header class="top-bar">
+    <div class="left">
+      <button class="back" type="button" aria-label="返回首页" @click="emit('back')">
+        <el-icon aria-hidden="true"><ArrowLeft /></el-icon>
+      </button>
+      <img class="logo" src="/logo.png" alt="" />
+      <el-dropdown trigger="click" @command="onCommand">
+        <button class="name-btn" type="button" aria-label="应用菜单">
+          <span class="name" :title="name">{{ name }}</span>
+          <el-icon class="arrow" aria-hidden="true"><ArrowDown /></el-icon>
+        </button>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="rename">重命名</el-dropdown-item>
+            <el-dropdown-item command="home">返回首页</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+    </div>
+
+    <el-button class="deploy" type="primary" :loading="deploying" :disabled="!canDeploy" @click="emit('deploy')">
+      <el-icon v-if="!deploying" aria-hidden="true"><Upload /></el-icon>
+      {{ deployText }}
+    </el-button>
+  </header>
+</template>
+
 <script setup lang="ts">
 import { ArrowDown, ArrowLeft, Upload } from '@element-plus/icons-vue'
 import { ElButton, ElDropdown, ElDropdownItem, ElDropdownMenu, ElIcon } from 'element-plus'
@@ -27,34 +55,6 @@ function onCommand(command: string | number | object) {
   }
 }
 </script>
-
-<template>
-  <header class="top-bar">
-    <div class="left">
-      <button class="back" type="button" aria-label="返回首页" @click="emit('back')">
-        <el-icon aria-hidden="true"><ArrowLeft /></el-icon>
-      </button>
-      <img class="logo" src="/logo.png" alt="" />
-      <el-dropdown trigger="click" @command="onCommand">
-        <button class="name-btn" type="button" aria-label="应用菜单">
-          <span class="name" :title="name">{{ name }}</span>
-          <el-icon class="arrow" aria-hidden="true"><ArrowDown /></el-icon>
-        </button>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item command="rename">重命名</el-dropdown-item>
-            <el-dropdown-item command="home">返回首页</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-    </div>
-
-    <el-button class="deploy" type="primary" :loading="deploying" :disabled="!canDeploy" @click="emit('deploy')">
-      <el-icon v-if="!deploying" aria-hidden="true"><Upload /></el-icon>
-      {{ deployText }}
-    </el-button>
-  </header>
-</template>
 
 <style scoped>
 .top-bar {

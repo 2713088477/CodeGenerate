@@ -1,27 +1,3 @@
-<script setup lang="ts">
-import { CircleCheckFilled, CopyDocument, TopRight } from '@element-plus/icons-vue'
-import { ElButton, ElDialog, ElIcon, ElInput, ElMessage } from 'element-plus'
-
-const props = defineProps<{
-  url: string
-}>()
-
-const visible = defineModel<boolean>({ required: true })
-
-async function copy() {
-  try {
-    await navigator.clipboard.writeText(props.url)
-    ElMessage.success('链接已复制')
-  } catch {
-    ElMessage.error('复制失败,请手动选择链接复制')
-  }
-}
-
-function open() {
-  window.open(props.url, '_blank', 'noopener')
-}
-</script>
-
 <template>
   <el-dialog v-model="visible" title="部署成功" width="460px" align-center append-to-body>
     <div class="result">
@@ -50,6 +26,30 @@ function open() {
     </template>
   </el-dialog>
 </template>
+
+<script setup lang="ts">
+import { CircleCheckFilled, CopyDocument, TopRight } from '@element-plus/icons-vue'
+import { ElButton, ElDialog, ElIcon, ElInput, ElMessage } from 'element-plus'
+
+const props = defineProps<{
+  url: string
+}>()
+
+const visible = defineModel<boolean>({ required: true })
+
+async function copy() {
+  try {
+    await navigator.clipboard.writeText(props.url)
+    ElMessage.success('链接已复制')
+  } catch {
+    ElMessage.error('复制失败,请手动选择链接复制')
+  }
+}
+
+function open() {
+  window.open(props.url, '_blank', 'noopener')
+}
+</script>
 
 <style scoped>
 .result {

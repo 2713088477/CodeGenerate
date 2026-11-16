@@ -1,36 +1,3 @@
-<script setup lang="ts">
-import { ArrowDown } from '@element-plus/icons-vue'
-import { ElAvatar, ElButton, ElDropdown, ElDropdownItem, ElDropdownMenu, ElIcon, ElMessage } from 'element-plus'
-import { storeToRefs } from 'pinia'
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { hasAdminPermission } from '@/router/permission'
-import { useUserStore } from '@/stores/user'
-
-const router = useRouter()
-const userStore = useUserStore()
-const { profile } = storeToRefs(userStore)
-
-const displayName = computed(() => profile.value?.username || profile.value?.userAccount || '已登录')
-const isAdmin = computed(() => hasAdminPermission(profile.value?.role))
-const avatarText = computed(() => displayName.value.slice(0, 1))
-
-function goLogin() {
-  router.push({ name: 'login' })
-}
-
-async function onLogout() {
-  await userStore.logout()
-  ElMessage.success('已退出登录')
-}
-
-function onAccountCommand(command: string | number) {
-  if (command === 'logout') {
-    void onLogout()
-  }
-}
-</script>
-
 <template>
   <div class="header-bar">
     <div class="header-start">
@@ -64,6 +31,39 @@ function onAccountCommand(command: string | number) {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { ArrowDown } from '@element-plus/icons-vue'
+import { ElAvatar, ElButton, ElDropdown, ElDropdownItem, ElDropdownMenu, ElIcon, ElMessage } from 'element-plus'
+import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { hasAdminPermission } from '@/router/permission'
+import { useUserStore } from '@/stores/user'
+
+const router = useRouter()
+const userStore = useUserStore()
+const { profile } = storeToRefs(userStore)
+
+const displayName = computed(() => profile.value?.username || profile.value?.userAccount || '已登录')
+const isAdmin = computed(() => hasAdminPermission(profile.value?.role))
+const avatarText = computed(() => displayName.value.slice(0, 1))
+
+function goLogin() {
+  router.push({ name: 'login' })
+}
+
+async function onLogout() {
+  await userStore.logout()
+  ElMessage.success('已退出登录')
+}
+
+function onAccountCommand(command: string | number) {
+  if (command === 'logout') {
+    void onLogout()
+  }
+}
+</script>
 
 <style scoped>
 .header-bar {

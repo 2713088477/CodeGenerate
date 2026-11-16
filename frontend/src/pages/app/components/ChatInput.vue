@@ -1,3 +1,31 @@
+<template>
+  <form class="chat-input" @submit.prevent="submit">
+    <el-input
+      v-model="text"
+      class="field"
+      type="textarea"
+      :autosize="{ minRows: 2, maxRows: 6 }"
+      :maxlength="MAX_LENGTH"
+      resize="none"
+      placeholder="描述你想要的页面或想调整的地方"
+      aria-label="发送给艺言的消息"
+      :disabled="disabled"
+      @keydown.enter="onEnter"
+    />
+    <div class="footer">
+      <span class="hint">Enter 发送,Shift + Enter 换行</span>
+      <button v-if="generating" class="action stop" type="button" aria-label="停止生成" @click="emit('stop')">
+        <el-icon aria-hidden="true"><VideoPause /></el-icon>
+        停止
+      </button>
+      <button v-else class="action send" type="submit" :disabled="!canSend" aria-label="发送">
+        <el-icon aria-hidden="true"><Promotion /></el-icon>
+        发送
+      </button>
+    </div>
+  </form>
+</template>
+
 <script setup lang="ts">
 import { Promotion, VideoPause } from '@element-plus/icons-vue'
 import { ElIcon, ElInput } from 'element-plus'
@@ -36,34 +64,6 @@ function onEnter(event: Event | KeyboardEvent) {
   submit()
 }
 </script>
-
-<template>
-  <form class="chat-input" @submit.prevent="submit">
-    <el-input
-      v-model="text"
-      class="field"
-      type="textarea"
-      :autosize="{ minRows: 2, maxRows: 6 }"
-      :maxlength="MAX_LENGTH"
-      resize="none"
-      placeholder="描述你想要的页面或想调整的地方"
-      aria-label="发送给艺言的消息"
-      :disabled="disabled"
-      @keydown.enter="onEnter"
-    />
-    <div class="footer">
-      <span class="hint">Enter 发送,Shift + Enter 换行</span>
-      <button v-if="generating" class="action stop" type="button" aria-label="停止生成" @click="emit('stop')">
-        <el-icon aria-hidden="true"><VideoPause /></el-icon>
-        停止
-      </button>
-      <button v-else class="action send" type="submit" :disabled="!canSend" aria-label="发送">
-        <el-icon aria-hidden="true"><Promotion /></el-icon>
-        发送
-      </button>
-    </div>
-  </form>
-</template>
 
 <style scoped>
 .chat-input {

@@ -1,3 +1,149 @@
+<template>
+  <section class="user-page">
+      <el-form class="search-form" :inline="true" @submit.prevent="onSearch">
+        <el-form-item label="账号">
+          <el-input v-model="userAccount" class="search-input" placeholder="请输入账号" clearable />
+        </el-form-item>
+        <el-form-item label="用户名">
+          <el-input v-model="username" class="search-input" placeholder="请输入用户名" clearable />
+        </el-form-item>
+        <el-form-item label="角色">
+          <el-select v-model="role" class="search-select" placeholder="全部" clearable>
+            <el-option
+              v-for="item in roleOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item class="search-actions">
+          <el-button type="primary" native-type="submit">查询</el-button>
+          <el-button @click="onReset">重置</el-button>
+          <el-button type="primary" @click="openCreate">新建</el-button>
+        </el-form-item>
+      </el-form>
+
+      <div v-loading="loading" class="table-panel">
+        <el-table ref="userTable" :data="pageResult.records" @sort-change="onSortChange">
+          <el-table-column prop="userAccount" label="账号" min-width="140" sortable="custom" show-overflow-tooltip />
+          <el-table-column prop="username" label="用户名" min-width="120" sortable="custom" show-overflow-tooltip />
+          <el-table-column label="头像" width="80">
+            <template #default="{ row }">
+              <el-avatar :size="32" :src="row.avatar || undefined">{{ avatarText(row) }}</el-avatar>
+            </template>
+          </el-table-column>
+          <el-table-column prop="bio" label="简介" min-width="180" show-overflow-tooltip />
+          <el-table-column prop="role" label="角色" width="110" sortable="custom">
+            <template #default="{ row }">{{ roleText(row.role) }}</template>
+          </el-table-column>
+          <el-table-column prop="createdAt" label="创建时间" min-width="180" sortable="custom">
+            <template #default="{ row }">{{ formatTime(row.createdAt) }}</template>
+          </el-table-column>
+          <el-table-column prop="updatedAt" label="更新时间" min-width="180" sortable="custom">
+            <template #default="{ row }">{{ formatTime(row.updatedAt) }}</template>
+          </el-table-column>
+          <el-table-column fixed="right" label="操作" width="140">
+            <template #default="{ row }">
+              <el-button link type="primary" @click="openEdit(row)">编辑</el-button>
+              <el-button link type="danger" @click="onDelete(row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <div class="table-footer">
+          <el-pagination
+            v-model:current-page="pageResult.pageNum"
+            v-model:page-size="pageResult.pageSize"
+            :total="pageResult.total"
+            :page-sizes="[10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next, jumper"
+            background
+            @current-change="onPageChange"
+            @size-change="onSizeChange"
+          />
+        </div>
+      </div>
+
+      <el-dialog v-model="createVisible" title="新建用户" width="480px">
+        <el-form ref="createFormRef" :model="createForm" :rules="createRules" label-width="88px">
+          <el-form-item label="账号" prop="userAccount">
+            <el-input v-model="createForm.userAccount" maxlength="32" placeholder="请输入账号" clearable />
+          </el-form-item>
+          <el-form-item label="密码" prop="userPassword">
+            <el-input v-model="createForm.userPassword" type="password" maxlength="64" show-password placeholder="请输入密码" />
+          </el-form-item>
+          <el-form-item label="确认密码" prop="confirmPassword">
+            <el-input v-model="createForm.confirmPassword" type="password" maxlength="64" show-password placeholder="请再次输入密码" />
+          </el-form-item>
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="createForm.username" maxlength="32" placeholder="请输入用户名" clearable />
+          </el-form-item>
+          <el-form-item label="头像" prop="avatar">
+            <el-input v-model="createForm.avatar" maxlength="1024" placeholder="请输入头像地址" clearable />
+          </el-form-item>
+          <el-form-item label="简介" prop="bio">
+            <el-input v-model="createForm.bio" type="textarea" maxlength="512" placeholder="请输入简介" />
+          </el-form-item>
+          <el-form-item label="角色" prop="role">
+            <el-select v-model="createForm.role" class="edit-select">
+              <el-option
+                v-for="item in roleOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <el-button @click="createVisible = false">取消</el-button>
+          <el-button type="primary" :loading="creating" @click="submitCreate">创建</el-button>
+        </template>
+      </el-dialog>
+
+      <el-dialog v-model="editVisible" title="编辑用户" width="480px">
+        <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="72px">
+          <el-form-item label="账号">
+            <el-input :model-value="editingAccount" disabled />
+          </el-form-item>
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="editForm.username" maxlength="32" placeholder="请输入用户名" clearable />
+          </el-form-item>
+          <el-form-item label="头像" prop="avatar">
+            <el-input v-model="editForm.avatar" maxlength="1024" placeholder="请输入头像地址" clearable />
+          </el-form-item>
+          <el-form-item label="简介" prop="bio">
+            <el-input v-model="editForm.bio" type="textarea" maxlength="512" placeholder="请输入简介" />
+          </el-form-item>
+          <el-form-item label="角色" prop="role">
+            <el-select v-model="editForm.role" class="edit-select">
+              <el-option
+                v-for="item in roleOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="密码" prop="userPassword">
+            <el-input
+              v-model="editForm.userPassword"
+              type="password"
+              maxlength="64"
+              show-password
+              placeholder="不修改请留空"
+            />
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <el-button @click="editVisible = false">取消</el-button>
+          <el-button type="primary" :loading="saving" @click="submitEdit">保存</el-button>
+        </template>
+      </el-dialog>
+  </section>
+</template>
+
 <script setup lang="ts">
 import { create, delete_, page, update } from '@/api'
 import type {
@@ -340,152 +486,6 @@ onMounted(() => {
   void loadUsers()
 })
 </script>
-
-<template>
-  <section class="user-page">
-      <el-form class="search-form" :inline="true" @submit.prevent="onSearch">
-        <el-form-item label="账号">
-          <el-input v-model="userAccount" class="search-input" placeholder="请输入账号" clearable />
-        </el-form-item>
-        <el-form-item label="用户名">
-          <el-input v-model="username" class="search-input" placeholder="请输入用户名" clearable />
-        </el-form-item>
-        <el-form-item label="角色">
-          <el-select v-model="role" class="search-select" placeholder="全部" clearable>
-            <el-option
-              v-for="item in roleOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item class="search-actions">
-          <el-button type="primary" native-type="submit">查询</el-button>
-          <el-button @click="onReset">重置</el-button>
-          <el-button type="primary" @click="openCreate">新建</el-button>
-        </el-form-item>
-      </el-form>
-
-      <div v-loading="loading" class="table-panel">
-        <el-table ref="userTable" :data="pageResult.records" @sort-change="onSortChange">
-          <el-table-column prop="userAccount" label="账号" min-width="140" sortable="custom" show-overflow-tooltip />
-          <el-table-column prop="username" label="用户名" min-width="120" sortable="custom" show-overflow-tooltip />
-          <el-table-column label="头像" width="80">
-            <template #default="{ row }">
-              <el-avatar :size="32" :src="row.avatar || undefined">{{ avatarText(row) }}</el-avatar>
-            </template>
-          </el-table-column>
-          <el-table-column prop="bio" label="简介" min-width="180" show-overflow-tooltip />
-          <el-table-column prop="role" label="角色" width="110" sortable="custom">
-            <template #default="{ row }">{{ roleText(row.role) }}</template>
-          </el-table-column>
-          <el-table-column prop="createdAt" label="创建时间" min-width="180" sortable="custom">
-            <template #default="{ row }">{{ formatTime(row.createdAt) }}</template>
-          </el-table-column>
-          <el-table-column prop="updatedAt" label="更新时间" min-width="180" sortable="custom">
-            <template #default="{ row }">{{ formatTime(row.updatedAt) }}</template>
-          </el-table-column>
-          <el-table-column fixed="right" label="操作" width="140">
-            <template #default="{ row }">
-              <el-button link type="primary" @click="openEdit(row)">编辑</el-button>
-              <el-button link type="danger" @click="onDelete(row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-
-        <div class="table-footer">
-          <el-pagination
-            v-model:current-page="pageResult.pageNum"
-            v-model:page-size="pageResult.pageSize"
-            :total="pageResult.total"
-            :page-sizes="[10, 20, 50, 100]"
-            layout="total, sizes, prev, pager, next, jumper"
-            background
-            @current-change="onPageChange"
-            @size-change="onSizeChange"
-          />
-        </div>
-      </div>
-
-      <el-dialog v-model="createVisible" title="新建用户" width="480px">
-        <el-form ref="createFormRef" :model="createForm" :rules="createRules" label-width="88px">
-          <el-form-item label="账号" prop="userAccount">
-            <el-input v-model="createForm.userAccount" maxlength="32" placeholder="请输入账号" clearable />
-          </el-form-item>
-          <el-form-item label="密码" prop="userPassword">
-            <el-input v-model="createForm.userPassword" type="password" maxlength="64" show-password placeholder="请输入密码" />
-          </el-form-item>
-          <el-form-item label="确认密码" prop="confirmPassword">
-            <el-input v-model="createForm.confirmPassword" type="password" maxlength="64" show-password placeholder="请再次输入密码" />
-          </el-form-item>
-          <el-form-item label="用户名" prop="username">
-            <el-input v-model="createForm.username" maxlength="32" placeholder="请输入用户名" clearable />
-          </el-form-item>
-          <el-form-item label="头像" prop="avatar">
-            <el-input v-model="createForm.avatar" maxlength="1024" placeholder="请输入头像地址" clearable />
-          </el-form-item>
-          <el-form-item label="简介" prop="bio">
-            <el-input v-model="createForm.bio" type="textarea" maxlength="512" placeholder="请输入简介" />
-          </el-form-item>
-          <el-form-item label="角色" prop="role">
-            <el-select v-model="createForm.role" class="edit-select">
-              <el-option
-                v-for="item in roleOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </el-form-item>
-        </el-form>
-        <template #footer>
-          <el-button @click="createVisible = false">取消</el-button>
-          <el-button type="primary" :loading="creating" @click="submitCreate">创建</el-button>
-        </template>
-      </el-dialog>
-
-      <el-dialog v-model="editVisible" title="编辑用户" width="480px">
-        <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="72px">
-          <el-form-item label="账号">
-            <el-input :model-value="editingAccount" disabled />
-          </el-form-item>
-          <el-form-item label="用户名" prop="username">
-            <el-input v-model="editForm.username" maxlength="32" placeholder="请输入用户名" clearable />
-          </el-form-item>
-          <el-form-item label="头像" prop="avatar">
-            <el-input v-model="editForm.avatar" maxlength="1024" placeholder="请输入头像地址" clearable />
-          </el-form-item>
-          <el-form-item label="简介" prop="bio">
-            <el-input v-model="editForm.bio" type="textarea" maxlength="512" placeholder="请输入简介" />
-          </el-form-item>
-          <el-form-item label="角色" prop="role">
-            <el-select v-model="editForm.role" class="edit-select">
-              <el-option
-                v-for="item in roleOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="密码" prop="userPassword">
-            <el-input
-              v-model="editForm.userPassword"
-              type="password"
-              maxlength="64"
-              show-password
-              placeholder="不修改请留空"
-            />
-          </el-form-item>
-        </el-form>
-        <template #footer>
-          <el-button @click="editVisible = false">取消</el-button>
-          <el-button type="primary" :loading="saving" @click="submitEdit">保存</el-button>
-        </template>
-      </el-dialog>
-  </section>
-</template>
 
 <style scoped>
 .user-page {

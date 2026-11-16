@@ -1,8 +1,3 @@
-<script setup lang="ts">
-import { ElContainer, ElHeader, ElMain } from 'element-plus'
-import AppHeader from '@/components/AppHeader.vue'
-</script>
-
 <template>
   <el-container class="app-layout" direction="vertical">
     <el-header class="app-header" height="64px">
@@ -13,6 +8,11 @@ import AppHeader from '@/components/AppHeader.vue'
     </el-main>
   </el-container>
 </template>
+
+<script setup lang="ts">
+import { ElContainer, ElHeader, ElMain } from 'element-plus'
+import AppHeader from '@/components/AppHeader.vue'
+</script>
 
 <style scoped>
 .app-layout {

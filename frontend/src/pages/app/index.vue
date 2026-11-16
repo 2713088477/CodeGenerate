@@ -1,3 +1,35 @@
+<template>
+  <div class="workspace">
+    <AppTopBar :app="app" :deploying="deploying" :can-deploy="canDeploy" @back="goHome" @rename="onRename" @deploy="onDeploy" />
+
+    <div class="tabs" role="tablist" aria-label="工作区">
+      <button class="tab" type="button" role="tab" :aria-selected="tab === 'chat'" :class="{ 'is-active': tab === 'chat' }" @click="tab = 'chat'">
+        对话
+      </button>
+      <button class="tab" type="button" role="tab" :aria-selected="tab === 'preview'" :class="{ 'is-active': tab === 'preview' }" @click="tab = 'preview'">
+        预览
+      </button>
+    </div>
+
+    <main class="body" :data-tab="tab">
+      <div class="col chat-col">
+        <ChatPanel :messages="messages" :generating="generating" @send="onSend" @stop="stop" @retry="retry" />
+      </div>
+      <div class="col preview-col">
+        <PreviewPanel
+          :app-id="appId"
+          :has-preview="hasPreview"
+          :version="version"
+          :generating="generating"
+          :files="previewFiles"
+        />
+      </div>
+    </main>
+
+    <DeployDialog v-model="deployVisible" :url="deployUrl" />
+  </div>
+</template>
+
 <script setup lang="ts">
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { storeToRefs } from 'pinia'
@@ -149,38 +181,6 @@ onBeforeRouteLeave(async () => {
 
 onMounted(init)
 </script>
-
-<template>
-  <div class="workspace">
-    <AppTopBar :app="app" :deploying="deploying" :can-deploy="canDeploy" @back="goHome" @rename="onRename" @deploy="onDeploy" />
-
-    <div class="tabs" role="tablist" aria-label="工作区">
-      <button class="tab" type="button" role="tab" :aria-selected="tab === 'chat'" :class="{ 'is-active': tab === 'chat' }" @click="tab = 'chat'">
-        对话
-      </button>
-      <button class="tab" type="button" role="tab" :aria-selected="tab === 'preview'" :class="{ 'is-active': tab === 'preview' }" @click="tab = 'preview'">
-        预览
-      </button>
-    </div>
-
-    <main class="body" :data-tab="tab">
-      <div class="col chat-col">
-        <ChatPanel :messages="messages" :generating="generating" @send="onSend" @stop="stop" @retry="retry" />
-      </div>
-      <div class="col preview-col">
-        <PreviewPanel
-          :app-id="appId"
-          :has-preview="hasPreview"
-          :version="version"
-          :generating="generating"
-          :files="previewFiles"
-        />
-      </div>
-    </main>
-
-    <DeployDialog v-model="deployVisible" :url="deployUrl" />
-  </div>
-</template>
 
 <style scoped>
 .workspace {
